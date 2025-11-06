@@ -15,7 +15,7 @@ To perform motif scanning:
 
 1. **Identify input files**: BED, narrowPeak, or broadPeak files containing genomic regions. Detect and standardize chromosome names (chr1 ↔ 1, chrM ↔ MT) before analysis to match the HOMER genome format and avoid missing sequences.
 2. **Determine genome assembly**: hg38, mm10, hg19, mm9, etc.
-3. **Prepare motif files**: Position-specific scoring matrices (PSSM) in HOMER format, saved in ${HOMER_data}/knownTFs/motifs/${tf}.motif
+3. **Prepare motif files**: Position-specific scoring matrices (PSSM) in HOMER format, saved in ${HOMER_data}/knownTFs/motifs/${tf}.motif, and "tf" should be in lower case.
 4. **Set scanning parameters**: Region size, score thresholds, output format
 5. **Run HOMER motif scanning command**
 
@@ -62,7 +62,7 @@ scanMotifGenomeWide.pl <motif_file> <genome> [options] > output.bed
 
 **Example:**
 ```bash
-scanMotifGenomeWide.pl ${tf}.motif hg38 -bed > genome_scan.bed
+scanMotifGenomeWide.pl ${HOMER_data}/knownTFs/motifs/ctcf.motif hg38 -bed > genome_scan.bed
 ```
 
 ### BED Format Output
@@ -70,7 +70,7 @@ scanMotifGenomeWide.pl ${tf}.motif hg38 -bed > genome_scan.bed
 Generate BED files with exact motif locations:
 
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 -mbed > motif_locations.bed
+annotatePeaks.pl peaks.bed hg38 -m ${HOMER_data}/knownTFs/motifs/ctcf.motif -size 200 -mbed > motif_locations.bed
 ```
 
 ## File Format Handling
@@ -198,25 +198,25 @@ meme2meme meme_output/meme.txt -homer > homer_motifs.motif
 
 ### Multi-motif Scanning
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m multiple_motifs.motif -size 200 -nmotifs 5 > all_hits.txt
+annotatePeaks.pl peaks.bed hg38 -m ${HOMER_data}/knownTFs/known.motifs -size 200 -nmotifs 5 > all_hits.txt
 ```
 
 ### BED Output for Visualization
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 -mbed > motif_locations.bed
+annotatePeaks.pl peaks.bed hg38 -m ${HOMER_data}/knownTFs/motifs/ctcf.motif -size 200 -mbed > motif_locations.bed
 ```
 
 ### Genome-wide Scanning
 ```bash
-scanMotifGenomeWide.pl ${tf}.motif hg38 -bed -p 8 > genome_scan.bed
+scanMotifGenomeWide.pl ${HOMER_data}/knownTFs/motifs/ctcf.motif hg38 -bed -p 8 > genome_scan.bed
 ```
 
 ### Score-based Filtering
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 -mscore | awk '$NF > 8.0' > high_score_hits.txt
+annotatePeaks.pl peaks.bed hg38 -m ${HOMER_data}/knownTFs/motifs/ctcf.motif -size 200 -mscore | awk '$NF > 8.0' > high_score_hits.txt
 ```
 
 ### Strand-specific Analysis
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 | grep "+" > forward_strand_hits.txt
+annotatePeaks.pl peaks.bed hg38 -m ${HOMER_data}/knownTFs/motifs/ctcf.motif -size 200 | grep "+" > forward_strand_hits.txt
 ```

@@ -69,17 +69,17 @@ annotatePeaks.pl peaks.bed hg38 -m known.motifs -size 200 -nmotifs 3 > motif_hit
 
 ### BED Format Output
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m motif.motif -size 200 -mbed > motif_locations.bed
+annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 -mbed > motif_locations.bed
 ```
 
 ### Genome-wide Scanning
 ```bash
-scanMotifGenomeWide.pl motif.motif hg38 -bed -p 8 > genome_scan.bed
+scanMotifGenomeWide.pl ${tf}.motif hg38 -bed -p 8 > genome_scan.bed
 ```
 
 ### Score-based Filtering
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m motif.motif -size 200 -mscore | awk '$NF > 8.0' > high_score_hits.txt
+annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 -mscore | awk '$NF > 8.0' > high_score_hits.txt
 ```
 
 ### Multi-motif Scanning
@@ -89,7 +89,7 @@ annotatePeaks.pl peaks.bed hg38 -m multiple_motifs.motif -size 200 -nmotifs 5 > 
 
 ### Strand-specific Analysis
 ```bash
-annotatePeaks.pl peaks.bed hg38 -m motif.motif -size 200 | grep "+" > forward_strand_hits.txt
+annotatePeaks.pl peaks.bed hg38 -m ${tf}.motif -size 200 | grep "+" > forward_strand_hits.txt
 ```
 
 ## Output Files Explained
@@ -136,6 +136,7 @@ Continuous score tracks:
 ## Motif File Formats
 
 ### HOMER Motif Format
+Motif file for all TFs is ${HOMER_data}/knownTFs/all.motifs and motif file for known TFs are in ${HOMER_data}/knownTFs/known.motifs. Separate motif files are under ${HOMER_data}/knownTFs/motifs.
 Position-specific scoring matrix format:
 ```
 >MOTIF_NAME

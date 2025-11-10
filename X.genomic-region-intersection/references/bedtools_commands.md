@@ -1,4 +1,3 @@
----
 
 # BEDTools Intersect Command Reference
 
@@ -159,6 +158,3 @@ bedtools intersect -a peaks.bed -b mark1.bed mark2.bed mark3.bed -c > peak_overl
 | Missing columns        | Input format not recognized                            | Ensure BED/GTF files are tab-delimited and properly formatted |
 
 ---
-
-Would you like me to name this file as `intersect_commands.md` (matching your SKILL documentation convention) and format it with a “## SKILL” header block (like your `genomic-feature-annotation` SKILL.md files)?
-That would make it directly usable in your **Claude skills agent setup**.

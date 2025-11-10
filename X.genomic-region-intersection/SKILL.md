@@ -1,6 +1,6 @@
 ---
 name: genomic-region-intersection
-description: This skill performs intersection and overlap analysis between genomic interval files (e.g., BED, narrowPeak, or GTF). It identifies overlapping or nearby regions such as TF binding sites overlapping gene annotations, promoters, or other regulatory regions using bedtools or pybedtools.
+description: This skill performs intersection and overlap analysis between genomic interval files (e.g., BED, narrowPeak, or GTF). It identifies overlapping or nearby regions such as TF binding sites overlapping gene annotations, promoters, or other regulatory regions like TF peaks, histone modification peaks, open chromatin regions, etc, using bedtools. 
 
 ---
 

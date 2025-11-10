@@ -140,6 +140,12 @@ annotatePeaks.pl ATAC_peaks.bed hg38 -size 5000 -hist 100 > ATAC_annotation.txt
 | `annotation_stats.txt` | Summary of peak annotation counts |
 | `annotation_plot.png` (optional) | Visualization of feature distribution |
 
+### annotated_regions.txt looks like:
+PeakID (cmd=annotatePeaks.pl /Users/wym1193/data/agent_testing_files/human_EZH2/EZH2_GM12878.bed hg38 -annStats /Users/wym1193/data/agent_testing_files/human_EZH2/results/annotation_stats.txt)	Chr	Start	End	Strand	Peak Score	Focus Ratio/Region Size	Annotation	Detailed Annotation	Distance to TSS	Nearest PromoterID	Entrez ID	Nearest Unigene	Nearest Refseq	Nearest Ensembl	Gene Name	Gene Alias	Gene Description	Gene Type
+1717	chr2	101474943	101475238	+	0	NA	promoter-TSS (NM_001145664)	promoter-TSS (NM_001145664)	22	NM_001367510	731220		NM_207403	ENSG00000196460	RFX8	-	regulatory factor X8	protein-coding
+702	chr1	156690302	156690597	+	0	NA	Intergenic	L3b|LINE|CR1	-13042	NM_006617	10763		NM_006617	ENSG00000132688	NES	Nbla00170	nestin	protein-coding
+308	chr10	3197891	3198186	+	0	NA	Intergenic	Intergenic	-25197	NM_001242307	10531		NM_014889	ENSG00000107959	PITRM1	MP1|PreP|SCAR30	pitrilysin metallopeptidase 1	protein-coding
+
 ---
 
 ## Best Practices

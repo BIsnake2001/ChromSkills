@@ -19,8 +19,8 @@ description: Perform GO and KEGG functional enrichment using HOMER from genomic 
 ## Inputs & Outputs
 
 **Inputs (choose one):**
-- `*.bed|*.narrowPeak|*.broadPeak` with ≥3 columns (chrom, start, end); extra columns allowed.
-- `gene_list.txt` with one official gene symbol per line (no header).
+- `*.bed|*.narrowPeak|*.broadPeak` with at least 3 columns (chrom, start, end); extra columns allowed.
+- `gene_list.txt` with one official gene symbol per line (no header). And an optional `gene_list_background.txt` with one official gene symbol per line (no header).
 
 **Required parameters:**
 - `--genome <hg38|hg19|mm10|mm9|...>` HOMER genome key (must be installed).
@@ -72,10 +72,7 @@ awk 'NR>1{print $2}' results/{run}/tables/all_annotated.tsv | sed 's/[;,].*//' |
 
 **A4. GO & KEGG enrichment**
 ```bash
-findGO.pl results/{run}/tables/genes.txt human -ontology biological_process  > results/{run}/tables/go_bp.tsv
-findGO.pl results/{run}/tables/genes.txt human -ontology molecular_function > results/{run}/tables/go_mf.tsv
-findGO.pl results/{run}/tables/genes.txt human -ontology cellular_component > results/{run}/tables/go_cc.tsv
-findGO.pl results/{run}/tables/genes.txt human -kegg > results/{run}/tables/kegg.tsv
+findGO.pl results/{run}/tables/genes.txt human results/{run}/tables > results/{run}/tables/go_results.tsv ## if no background gene list provided
 ```
 
 > **Alternative direct from BED**  
@@ -86,16 +83,12 @@ findGO.pl results/{run}/tables/genes.txt human -kegg > results/{run}/tables/kegg
 
 **B1. GO & KEGG enrichment**
 ```bash
-findGO.pl gene_list.txt hg38 -ontology biological_process  > results/{run}/tables/go_bp.tsv
-findGO.pl gene_list.txt hg38 -ontology molecular_function > results/{run}/tables/go_mf.tsv
-findGO.pl gene_list.txt hg38 -ontology cellular_component > results/{run}/tables/go_cc.tsv
-findGO.pl gene_list.txt hg38 -kegg > results/{run}/tables/kegg.tsv
+findGO.pl results/{run}/input/genes_list.txt human results/{run}/tables > results/{run}/tables/go_results.tsv ## if no background gene list provided
 ```
 
 **B2. Optional background**
 ```bash
-findGO.pl gene_list.txt hg38 -bg background.txt -ontology biological_process > results/{run}/tables/go_bp.bg.tsv
-findGO.pl gene_list.txt hg38 -bg background.txt -kegg > results/{run}/tables/kegg.bg.tsv
+findGO.pl results/{run}/input/genes_list.txt human results/{run}/tables -bp results/{run}/input/genes_list_background.txt > results/{run}/tables/go_results.tsv ## if background gene list provided
 ```
 
 ## Visualization in R (barplot & dotplot)
@@ -108,7 +101,7 @@ only check the first line of the file to get column name if any bug occurs
 ```r
 library(readr); library(dplyr); library(ggplot2); library(forcats)
 
-df <- read_tsv("results/{run}/tables/go_bp.tsv", comment = "#", show_col_types = FALSE)
+df <- read_tsv("results/{run}/tables/go_results.tsv", comment = "#", show_col_types = FALSE)
 fdr <- intersect(c("BH/FDR","FDR","Q-value","Q"), names(df)); p <- intersect(c("P-value","P","P.value"), names(df))
 df$FDR2 <- if (length(fdr)) df[[fdr[1]]] else df[[p[1]]]
 df$score <- -log10(pmax(df$FDR2, 1e-300))
@@ -132,10 +125,7 @@ annotatePeaks.pl results/${run}/input/peaks.bed ${genome} -annStats results/${ru
 awk 'NR>1{print $2}' results/${run}/tables/annotated.tsv | sed 's/[;,].*//' | sort -u > results/${run}/tables/genes.txt
 
 # enrichment:
-findGO.pl results/${run}/tables/genes.txt ${genome} -ontology biological_process  > results/${run}/tables/go_bp.tsv
-findGO.pl results/${run}/tables/genes.txt ${genome} -ontology molecular_function > results/${run}/tables/go_mf.tsv
-findGO.pl results/${run}/tables/genes.txt ${genome} -ontology cellular_component > results/${run}/tables/go_cc.tsv
-findGO.pl results/${run}/tables/genes.txt ${genome} -kegg > results/${run}/tables/kegg.tsv
+findGO.pl results/{run}/input/genes_list.txt human results/{run}/tables > results/{run}/tables/go_results.tsv ## if no background gene list provided
 
 # then run the minimal R snippets above to create plots
 ```

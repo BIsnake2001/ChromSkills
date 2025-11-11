@@ -61,13 +61,13 @@ head -n 3 peaks.bed
 ```bash
 annotatePeaks.pl peaks.bed hg38 -annStats results/{run}/logs/annStats.txt   > results/{run}/tables/annotated.tsv 2> results/{run}/logs/annotate.log
 
-awk 'NR>1{print $2}' results/{run}/tables/annotated.tsv | sed 's/[;,].*//' | sort -u   > results/{run}/tables/genes.txt
+awk 'NR>1{print $16}' results/{run}/tables/annotated.tsv | sed 's/[;,].*//' | sort -u   > results/{run}/tables/genes.txt
 ```
 
 **A3. (Optional) Build a background**
 ```bash
 annotatePeaks.pl all_regions.bed hg38 > results/{run}/tables/all_annotated.tsv
-awk 'NR>1{print $2}' results/{run}/tables/all_annotated.tsv | sed 's/[;,].*//' | sort -u   > results/{run}/tables/background.txt
+awk 'NR>1{print $16}' results/{run}/tables/all_annotated.tsv | sed 's/[;,].*//' | sort -u   > results/{run}/tables/background.txt
 ```
 
 **A4. GO & KEGG enrichment**
@@ -122,7 +122,7 @@ mkdir -p results/${run}/{input,tables,plots,logs}
 # from regions:
 cp peaks.bed results/${run}/input/
 annotatePeaks.pl results/${run}/input/peaks.bed ${genome} -annStats results/${run}/logs/annStats.txt > results/${run}/tables/annotated.tsv
-awk 'NR>1{print $2}' results/${run}/tables/annotated.tsv | sed 's/[;,].*//' | sort -u > results/${run}/tables/genes.txt
+awk 'NR>1{print $16}' results/${run}/tables/annotated.tsv | sed 's/[;,].*//' | sort -u > results/${run}/tables/genes.txt
 
 # enrichment:
 findGO.pl results/{run}/input/genes_list.txt human results/{run}/tables > results/{run}/tables/go_results.tsv ## if no background gene list provided

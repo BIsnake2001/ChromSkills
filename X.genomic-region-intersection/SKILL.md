@@ -73,6 +73,24 @@ bedtools window -a TF_peaks.bed -b TSS.bed -w 1000 > TF_near_TSS.bed
 
 This finds TF peaks within ±1 kb of a TSS.
 
+#### Example 5. Find overlaps between two BED files (for overlapping ratio calculation)
+
+```bash
+### for bed A
+bedtools intersect -a A.bed -b B.bed -u > A_overlap_B.bed
+# count the number of overlapping regions
+wc -l A_overlap_B.bed
+# for bed B
+bedtools intersect -a B.bed -a A.bed -u > B_overlap_A.bed
+# count the number of overlapping regions
+wc -l B_overlap_A.bed
+```
+**Flags explanation:**
+
+* `-a`: primary file (e.g., A.bed)
+* `-b`: secondary file (e.g., B.bed)
+* `-u`: only report overlapping regions once
+
 ---
 
 ### 3. Visualization of Overlap Results

@@ -1,60 +1,90 @@
 ---
 name: TF-differential-binding
-description: This skill performs differential transcription factor (TF) binding analysis from ChIP-seq data using the DiffBind package in R. It provides workflows for sample loading, contrast definition, normalization, statistical testing, and identification of differentially bound regions between experimental conditions.
+description: The TF-differential-binding pipeline performs differential transcription factor (TF) binding analysis from ChIP-seq datasets (TF peaks) using the DiffBind package in R. It identifies genomic regions where TF binding intensity significantly differs between experimental conditions (e.g., treatment vs. control, mutant vs. wild-type). Use the TF-differential-binding pipeline when you need to analyze the different function of the same TF across two or more biological conditions, cell types, or treatments using ChIP-seq data or TF binding peaks. This pipeline is ideal for studying regulatory mechanisms that underlie transcriptional differences or epigenetic responses to perturbations.
 ---
 
 # DiffBind TF Differential Binding Analysis
 
 ## Overview
 
-This skill enables comprehensive differential TF binding analysis using **DiffBind** in R. DiffBind integrates read counting, normalization, and statistical modeling (via DESeq2 or edgeR) to identify differentially bound peaks between conditions.
+This skill enables comprehensive differential TF binding analysis using **DiffBind** in R. DiffBind integrates read counting, normalization, and statistical modeling to identify differentially bound peaks between conditions.
 
 To perform DiffBind differential binding analysis:
-
-1. **Prepare input data**: Provide a sample sheet with ChIP-seq peak files and corresponding BAM files for each sample.
-2. **Load data into DiffBind**: Construct a `DBA` object from the sample sheet.
-3. **Count reads**: Compute read counts over consensus peak regions.
-4. **Define contrasts**: Specify experimental conditions (e.g., treatment vs. control or cell_type_A vs. cell_type_B).
-5. **Perform differential analysis**: Run statistical tests to identify differentially bound regions.
-6. **Visualize and interpret**: Generate correlation heatmaps, PCA plots, and volcano plots; extract significant binding events.
+- Refer to the **Inputs & Outputs** section to check inputs and build the output architecture.
+- **Always wait the user feedback** if required files are not available in the current working directory by asking "${files} not available, provide required files or skip and proceed ?" 
+- Provide a sample sheet with ChIP-seq peak files and corresponding BAM files for each sample.
+- Construct a `DBA` object from the sample sheet.
+- Compute read counts over consensus peak regions.
+- Specify experimental conditions (e.g., treatment vs. control or cell_type_A vs. cell_type_B).
+- Run statistical tests to identify differentially bound regions.
+- Generate correlation heatmaps, PCA plots, and volcano plots; extract significant binding events.
 
 ---
 
-## Quick Start
+## When to use this skill
+Use the TF-differential-binding pipeline when you need to analyze the different function of the same TF across two or more biological conditions, cell types, or treatments using ChIP-seq data or TF binding peaks. This pipeline is ideal for studying regulatory mechanisms that underlie transcriptional differences or epigenetic responses to perturbations.
 
-### 1. Prepare Input Data
+Recommended applications include:
 
-Create a CSV sample sheet (`samplesheet.csv`) with the following columns:
+- Comparing treated vs. control or wild-type vs. mutant conditions to identify TF binding changes in response to stimuli, drugs, or mutations.
+- Comparing TF binding profiles between two cell types or experimental conditions to identify differentially bound regions (DBRs).
+- Comparing the different TF function in two conditions.
+- Integrating with RNA-seq to correlate TF binding alterations with gene expression changes.
+- Investigating co-factor dependencies or chromatin remodeling events linked to TF occupancy.
 
-| SampleID | Condition | Replicate | bamReads | Peaks | PeakCaller |
-|-----------|------------|------------|-----------|--------|-------------|
-| TF_A_1    | Control    | 1          | Control1.bam | Control1_peaks.narrowPeak | macs |
-| TF_A_2    | Control    | 2          | Control2.bam | Control2_peaks.narrowPeak | macs |
-| TF_B_1    | Treated    | 1          | Treated1.bam | Treated1_peaks.narrowPeak | macs |
-| TF_B_2    | Treated    | 2          | Treated2.bam | Treated2_peaks.narrowPeak | macs |
+---
 
-### 2. Load Data and Build the DiffBind Object
+## Inputs & Outputs
 
-```r
-library(DiffBind)
+### Inputs (choose one)
+- If starting from BAM files and BED peak files → Generate consensus peaks and count matrix.  
+- If starting from existing count matrix → Go directly to DiffBind analysis.  
+- If multiple conditions or batches → Include batch/condition in design 
 
-# Load the sample sheet
-samples <- read.csv("samplesheet.csv")
-
-# Create the DBA object
-dbObj <- dba(sampleSheet=samples)
+### Outputs
+```bash
+TF_DB_analysis/
+    DBs/
+      DB_results.csv # DESeq2 results (log2FC, p-values)
+      DB_up.bed
+      DB_down.bed  
+    plots/ # visualization outputs
+      PCA.pdf
+      volcano.pdf
+      heatmap.pdf
+    logs/ # analysis logs 
+    temp/ # other temp files
 ```
-
-**Key parameters:**
-- `sampleSheet`: CSV file with BAM and peak information
-- `PeakCaller`: must match the software used (e.g., "macs", "macs2", "bed")
-- Supports both narrowPeak and broadPeak formats
 
 ---
 
 ## Decision Tree
 
-### Step 1: Read Counting and Consensus Peak Generation
+### Step 1: Prepare Input Data
+
+Create a CSV sample sheet (`samplesheet.csv`) with the following columns:
+
+| SampleID | Tissue | Factor | Condition | bamReads | Peaks | PeakCaller |
+|-----------|------------|------------|-----------|--------|-------------|-------------|
+| TF_A_1    | A    | TF   | Control       | Control1.bam | Control1_peaks.narrowPeak | narrow |
+| TF_A_2    | A    | TF   | Control       | Control2.bam | Control2_peaks.narrowPeak | narrow |
+| TF_B_1    | A    | TF   | Treated       | Treated1.bam | Treated1_peaks.narrowPeak | narrow |
+| TF_B_2    | A    | TF   | Treated       | Treated2.bam | Treated2_peaks.narrowPeak | narrow |
+
+### Step 2: Load Data and Build the DiffBind Object
+
+```r
+library(DiffBind)
+samples <- read.csv("samplesheet.csv")
+dbObj <- dba(sampleSheet=samples)
+```
+
+**Key parameters:**
+- `sampleSheet`: CSV file with BAM and peak information
+- Supports both narrowPeak and broadPeak formats
+
+
+### Step 3: Read Counting and Consensus Peak Generation
 
 Count reads overlapping consensus peaks across samples:
 
@@ -69,7 +99,7 @@ dbObj <- dba.count(dbObj, summits=250)
 
 ---
 
-### Step 2: Contrast Definition
+### Step 4: Contrast Definition
 
 Define conditions for comparison:
 
@@ -87,16 +117,11 @@ dbObj <- dba.contrast(dbObj, categories=DBA_CONDITION, minMembers=2)
 
 ---
 
-### Step 3: Differential Binding Analysis
-
-Perform differential analysis using DESeq2 or edgeR:
+### Step 5: Differential Binding Analysis
 
 ```r
 # Perform analysis
 dbObj <- dba.analyze(dbObj, method=DBA_DESEQ2)
-
-# Extract results
-diffResults <- dba.report(dbObj, th=0.05, fold=1)
 ```
 
 **Parameters:**
@@ -107,7 +132,7 @@ diffResults <- dba.report(dbObj, th=0.05, fold=1)
 
 ---
 
-### Step 4: Visualization and Quality Control
+### Step 6: Visualization and Quality Control
 
 #### Correlation Heatmap
 
@@ -121,34 +146,39 @@ dba.plotHeatmap(dbObj, correlations=TRUE, scale="row")
 dba.plotPCA(dbObj, attributes=DBA_CONDITION, label=DBA_ID)
 ```
 
-#### MA Plot / Volcano Plot
+#### Volcano Plot
 
 ```r
-# MA plot
-plot(diffResults$Fold, -log10(diffResults$FDR),
-     pch=16, col=ifelse(diffResults$FDR < 0.05, "red", "grey"),
-     main="Differential Binding MA Plot")
-
 # Volcano plot
-with(diffResults, plot(Fold, -log10(FDR),
+allResults <- dba.report(dbObj, method=DBA_DESEQ2, th=1)
+with(allResults, plot(Fold, -log10(FDR),
      col=ifelse(FDR < 0.05 & abs(Fold) > 1, "red", "grey"),
      pch=16, main="Volcano Plot"))
 ```
+Output: `heatmap.pdf`  `Volcano.pdf` `PCA.pdf` 
 
 ---
 
-### Step 5: Result Extraction
+### Step 7: Result Extraction
 
 Export significant differential peaks:
 
 ```r
-# Get all significant binding sites
-sigSites <- dba.report(dbObj, method=DBA_DESEQ2, th=0.05)
-
-# Export as BED
+write.csv(as.data.frame(allResults), "DB_results.csv", row.names = FALSE)
 library(rtracklayer)
-export(sigSites, "differential_binding_peaks.bed")
+# Extract results with FDR < 0.05 and |log2FC| > 1
+sigSites <- dba.report(dbObj, method=DBA_DESEQ2, th=0.05, fold=1)
+print("Differential binding results summary:")
+print(summary(sigSites))
+
+# get the peaks that up or down in treated condition
+diff_up <- sigSites[sigSites$Fold > 0]
+diff_down <- sigSites[sigSites$Fold < 0]
+export(diff_up, "DB_up_${treated_condition}.bed")
+export(diff_down, "DB_down_${treated_condition}.bed")
 ```
+Output: `DB_results.csv`  `DB_up_${treated_condition}.bed` `DB_down_${treated_condition}.bed` 
+
 
 ---
 
@@ -168,33 +198,6 @@ export(sigSites, "differential_binding_peaks.bed")
 
 ---
 
-## Example End-to-End Workflow
-
-```r
-library(DiffBind)
-
-# Load sample sheet
-dbObj <- dba(sampleSheet="samplesheet.csv")
-
-# Count reads and generate consensus peaks
-dbObj <- dba.count(dbObj, summits=250)
-
-# Define contrast
-dbObj <- dba.contrast(dbObj, categories=DBA_CONDITION, minMembers=2)
-
-# Run DESeq2-based analysis
-dbObj <- dba.analyze(dbObj, method=DBA_DESEQ2)
-
-# Extract differential peaks
-diffSites <- dba.report(dbObj, th=0.05, fold=1)
-
-# Visualization
-dba.plotPCA(dbObj)
-dba.plotHeatmap(dbObj)
-```
-
----
-
 ## Troubleshooting
 
 | Problem | Possible Cause | Solution |
@@ -203,36 +206,3 @@ dba.plotHeatmap(dbObj)
 | Errors in sample sheet | Column names incorrect or missing | Use standard DiffBind column format |
 | Inconsistent genome build | Mixed genome assemblies | Ensure all BAM and peak files use the same genome reference |
 | Over-normalization | Strong batch effects | Include batch term in design or run `dba.contrast(..., block=...)` |
-
----
-
-## Advanced Topics
-
-### Multi-factor Designs
-
-Include multiple covariates:
-
-```r
-dbObj <- dba.contrast(dbObj, categories=c(DBA_TREATMENT, DBA_TISSUE))
-```
-
-### Custom Contrasts
-
-Manually define contrasts:
-
-```r
-dbObj <- dba.contrast(dbObj, contrast=c("Treated", "Control"), name1="Treated", name2="Control")
-```
-
-### Alternative Statistical Engines
-
-```r
-# Use edgeR instead of DESeq2
-dbObj <- dba.analyze(dbObj, method=DBA_EDGER)
-```
-
-### Export Results for Downstream Analysis
-
-```r
-write.table(as.data.frame(diffSites), "DiffBind_results.tsv", sep="\t", quote=FALSE)
-```

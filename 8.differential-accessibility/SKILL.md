@@ -21,7 +21,7 @@ Main steps include:
 
 ---
 
-## When to use this sill
+## When to use this skill
 Use the differential-accessibility pipeline when you aim to identify changes in chromatin accessibility across biological conditions, treatments, or cell types. It is particularly suited for ATAC-seq, DNase-seq, or other open-chromatin profiling datasets.
 
 Recommended scenarios include:

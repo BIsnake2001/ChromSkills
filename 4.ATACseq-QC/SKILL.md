@@ -1,3 +1,4 @@
+---
 name: ATACseq-QC
 description: Perform comprehensive ATAC-seq quality control using ataqv, samtools, and IDR, automatically detecting genome type and generating an integrated PDF report with key metrics and visualizations.
 ---

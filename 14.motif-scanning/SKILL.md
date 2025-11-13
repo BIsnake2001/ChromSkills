@@ -1,25 +1,76 @@
 ---
 name: motif-scanning
-description: This skill should be used when users need to perform motif scanning on ChIP-seq, ATAC-seq, or other genomic peak files using HOMER (Hypergeometric Optimization of Motif EnRichment). It scans genomic regions for specific transcription factor binding motifs using position-specific scoring matrices and identifies exact motif locations.
+description: This skill identifies the locations of known transcription factor (TF) binding motifs within genomic regions such as ChIP-seq or ATAC-seq peaks. It utilizes HOMER to search for specific sequence motifs defined by position-specific scoring matrices (PSSMs) from known motif databases. Use this skill when you need to detect the presence and precise genomic coordinates of known TF binding motifs within experimentally defined regions such as ChIP-seq or ATAC-seq peaks.
 ---
 
-# HOMER Motif Scanning
+# Motif Scanning
 
 ## Overview
 
-This skill enables comprehensive motif scanning using HOMER tools for genomic peak files. It scans genomic regions for specific transcription factor binding motifs using position-specific scoring matrices and identifies exact motif locations.
+This skill enables comprehensive motif scanning using HOMER tools for genomic peak files. It scans genomic regions for specific transcription factor binding motifs using position-specific scoring matrices and identifies exact motif locations.To perform motif scanning:
 
-## Quick Start
+- Always refer to the **Inputs & Outputs** section to check inputs and build the output architecture.
+- Genome assembly: Always returned from user feedback (hg38, mm10, hg19, mm9, etc), never determined by yourself.
+- Check chromosome names: Standardize chromosome names to format with "chr" (1 -> chr1, MT -> chrM).
+- Prepare motif files: Position-specific scoring matrices (PSSM) in HOMER format, saved in ${HOMER_data}/knownTFs/motifs/${tf}.motif, and "tf" should be in lower case.
+4. Set scanning parameters: Region size, score thresholds, output format
+5. Run HOMER motif scanning command
 
-To perform motif scanning:
+---
 
-1. **Identify input files**: BED, narrowPeak, or broadPeak files containing genomic regions. Detect and standardize chromosome names (chr1 ↔ 1, chrM ↔ MT) before analysis to match the HOMER genome format and avoid missing sequences.
-2. **Determine genome assembly**: hg38, mm10, hg19, mm9, etc.
-3. **Prepare motif files**: Position-specific scoring matrices (PSSM) in HOMER format, saved in ${HOMER_data}/knownTFs/motifs/${tf}.motif, and "tf" should be in lower case.
-4. **Set scanning parameters**: Region size, score thresholds, output format
-5. **Run HOMER motif scanning command**
+## When to use this skill
 
-## Core Capabilities
+- Scanning ChIP-seq or ATAC-seq peaks for known motifs to validate TF binding specificity.
+- Testing whether co-factor motifs (e.g., TAL1, KLF1, SPI1) co-occur within TF-bound or accessible regions to infer cooperative binding.
+- Evaluating motif distribution patterns relative to genomic landmarks such as transcription start sites (TSS) or enhancers.
+- Generating motif-annotated BED files for visualization in genome browsers or subsequent feature analysis.
+
+---
+
+## Inputs & Outputs
+
+### Inputs
+(1) Peak formats supported
+- **BED files**: Standard genomic interval format
+- **narrowPeak**: ENCODE narrow peak format
+- **broadPeak**: ENCODE broad peak format
+- **HOMER peak files**: Output from HOMER peak calling
+(2) Motif formats supported
+- **HOMER motif format**: Position-specific scoring matrices
+- **MEME motif format**: MEME suite motif format
+- **TRANSFAC format**: TRANSFAC database format
+
+Convert from MEME to HOMER format:
+
+```bash
+meme2meme meme_output/meme.txt -homer > homer_motifs.motif
+```
+
+### Outputs
+```bash
+motif_scan/
+    results/
+      ${motif}.anno # Peak annotations with motif hits
+      ${motif}.bed # Exact motif locations in genomic coordinates
+      ${motif}.bedgraph # Continuous motif score tracks
+    logs/ # analysis logs 
+        motif_scan.log
+    temp/ # other temp files
+```
+---
+
+## Decision Tree
+
+### Standardize chromosome names 
+
+From `1` format to `chr1` format
+From `MT` format to `chrM` format
+
+If the chromosome name not startswith "chr", then run:
+
+```bash
+awk '{print "chr"$1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10}' <peakfile> > <new_peakfile> 
+```
 
 ### Motif Scanning with annotatePeaks.pl
 
@@ -73,42 +124,6 @@ Generate BED files with exact motif locations:
 annotatePeaks.pl peaks.bed hg38 -m ${HOMER_data}/knownTFs/motifs/ctcf.motif -size 200 -mbed > motif_locations.bed
 ```
 
-## File Format Handling
-
-### Supported Input Formats
-- **BED files**: Standard genomic interval format
-- **narrowPeak**: ENCODE narrow peak format
-- **broadPeak**: ENCODE broad peak format
-- **HOMER peak files**: Output from HOMER peak calling
-
-### Motif File Formats
-- **HOMER motif format**: Position-specific scoring matrices
-- **MEME motif format**: MEME suite motif format
-- **TRANSFAC format**: TRANSFAC database format
-
-### Converting Between Formats
-
-Convert MACS2 output to HOMER format:
-```bash
-pos2bed.pl macs2_peaks.xls > peaks.bed
-```
-
-Convert narrowPeak to BED:
-```bash
-cut -f1-6 narrowPeak_file.narrowPeak > peaks.bed
-```
-
-## Genome Assembly Support
-
-HOMER supports multiple genome assemblies. Common assemblies include:
-- **Human**: hg38, hg19, hg18
-- **Mouse**: mm10, mm9
-- **Other**: dm6 (fly), ce10 (worm), rn6 (rat)
-
-To check available genomes:
-```bash
-findMotifsGenome.pl -list
-```
 
 ## Quality Control and Best Practices
 
@@ -124,60 +139,12 @@ findMotifsGenome.pl -list
 - **Score thresholds**: Use default or optimize based on motif quality
 - **Threads**: Use available CPU cores for faster processing
 
-## Output Interpretation
-
-### Key Output Files
-- **Tab-delimited output**: Peak annotations with motif hits
-- **BED format**: Exact motif locations in genomic coordinates
-- **bedGraph format**: Continuous motif score tracks
-
 ### Important Metrics
 - **Motif score**: Position-specific scoring matrix match score
 - **Position**: Exact genomic location of motif match
 - **Strand**: DNA strand where motif was found
 - **Sequence**: Actual DNA sequence at motif location
 
-## Motif File Preparation
-
-### HOMER Motif Format
-Create motif files in HOMER position-specific scoring matrix format:
-
-```
->MOTIF_NAME
-A [counts] C [counts] G [counts] T [counts]
-A [counts] C [counts] G [counts] T [counts]
-...
-```
-
-**Example:**
-```
->CTCF
-0.173 0.348 0.348 0.130
-0.161 0.339 0.375 0.125
-0.179 0.330 0.366 0.125
-0.155 0.330 0.384 0.131
-0.118 0.360 0.360 0.162
-0.118 0.360 0.360 0.162
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-0.125 0.348 0.384 0.143
-```
-
-### Converting Motif Formats
-Convert from MEME to HOMER format:
-```bash
-meme2meme meme_output/meme.txt -homer > homer_motifs.motif
-```
 
 ## Troubleshooting
 

@@ -1,24 +1,67 @@
 ---
 name: De-novo-motif-discovery
-description: This skill should be used when users need to perform de novo motif discovery on ChIP-seq, ATAC-seq, or other genomic peak files using HOMER (Hypergeometric Optimization of Motif EnRichment). It discovers novel transcription factor binding motifs from genomic regions without prior knowledge of motif patterns.
+description: This skill identifies novel transcription factor binding motifs directly from genomic regions of interest such as ChIP-seq peaks, ATAC-seq accessible sites, or differentially acessible regions. It employs HOMER (Hypergeometric Optimization of Motif Enrichment) to detect both known and previously uncharacterized sequence motifs enriched within the supplied genomic intervals. Use the skill when you need to uncover sequence motifs enriched or want to know which TFs might regulate the target regions.
 ---
 
 # HOMER De Novo Motif Discovery
 
 ## Overview
 
-This skill enables comprehensive de novo motif discovery using HOMER tools for genomic peak files. It discovers novel transcription factor binding motifs from genomic regions without requiring prior knowledge of motif patterns.
+This skill enables comprehensive de novo motif discovery using HOMER tools for genomic peak files. It discovers novel transcription factor binding motifs from genomic regions without requiring prior knowledge of motif patterns. To perform de novo motif discovery:
 
-## Quick Start
+- Always refer to the **Inputs & Outputs** section to check inputs and build the output architecture.
+- Genome assembly: Always returned from user feedback (hg38, mm10, hg19, mm9, etc), never determined by yourself.
+- Check chromosome names: Standardize chromosome names to format with "chr" (1 -> chr1, MT -> chrM).
+- Set analysis parameters: Region size, number of motifs, motif lengths
+- Run HOMER de novo motif discovery command
 
-To perform de novo motif discovery:
+---
 
-1. **Identify input files**: BED, narrowPeak, or broadPeak files containing genomic regions. Detect and standardize chromosome names (chr1 ↔ 1, chrM ↔ MT) before analysis to match the HOMER genome format and avoid missing sequences.
-2. **Determine genome assembly**: hg38, mm10, hg19, mm9, etc.
-3. **Set analysis parameters**: Region size, number of motifs, motif lengths
-4. **Run HOMER de novo motif discovery command**
+## When to use this skill
+Use this skill when you need to uncover sequence motifs enriched in a set of genomic regions, such as peaks from ChIP-seq or ATAC-seq, without prior assumptions about which transcription factors are involved. Use this skill after generating a peak or region set that represents a meaningful biological comparison (e.g., differentially accessible or bound sites). The resulting motifs provide mechanistic insights into which TFs or sequence features might drive the observed chromatin or binding differences. Typical use cases include:
 
-## Core Capabilities
+- Identifying unknown or cell-type–specific TF binding motifs in differential binding regions.
+- Performing motif enrichment analysis on ATAC-seq peaks to infer potential transcriptional regulators of accessible chromatin regions.
+- Exploring novel sequence patterns associated with enhancers, promoters, or other regulatory elements identified from functional genomics data.
+- Building mechanistic hypotheses by linking enriched motifs with TFs, expression data, or chromatin state information.
+
+---
+
+## Inputs & Outputs
+
+### Inputs
+- **BED files**: Standard genomic interval format
+- **narrowPeak**: ENCODE narrow peak format
+- **broadPeak**: ENCODE broad peak format
+- **HOMER peak files**: Output from HOMER peak calling
+
+### Outputs
+```bash
+denovo_motif/
+    results/
+        homerResults.html # De novo motif discovery results
+        motif<number>.motif # Individual motif files
+        seq.autonorm.tsv # Sequence composition statistics
+        motifFindingParameters.txt # Parameters used for analysis
+    logs/ # analysis logs 
+        motif.log
+    temp/ # other temp files
+```
+
+---
+
+## Decision Tree
+
+### Standardize chromosome names 
+
+From `1` format to `chr1` format
+From `MT` format to `chrM` format
+
+If the chromosome name not startswith "chr", then run:
+
+```bash
+awk '{print "chr"$1 "\t" $2 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $10}' <peakfile> > <new_peakfile> 
+```
 
 ### De Novo Motif Discovery
 
@@ -44,7 +87,7 @@ findMotifsGenome.pl <peakfile> <genome> <output_dir> [options]
 
 **Example:**
 ```bash
-findMotifsGenome.pl peaks.bed hg38 motif_output -size 200 -mask -p 8 -S 25 -len 8,10,12 -noknown
+findMotifsGenome.pl <target_peaks> <genome> <output_dir> -size 200 -mask -p 8 -S 25 -len 8,10,12 -noknown > motif.log 2>&1
 ```
 
 ### Comparative Analysis
@@ -52,7 +95,7 @@ findMotifsGenome.pl peaks.bed hg38 motif_output -size 200 -mask -p 8 -S 25 -len 
 For comparing motif discovery between two sets of peaks:
 
 ```bash
-findMotifsGenome.pl <target_peaks> <genome> <output_dir> -bg <background_peaks>  -noknown
+findMotifsGenome.pl <target_peaks> <genome> <output_dir> -bg <background_peaks> -noknown > motif.log 2>&1
 ```
 
 **Background options:**
@@ -62,39 +105,7 @@ findMotifsGenome.pl <target_peaks> <genome> <output_dir> -bg <background_peaks> 
 
 **Example:**
 ```bash
-findMotifsGenome.pl treatment_peaks.bed hg38 motif_output -bg control_peaks.bed -size 200 -p 8  -noknown
-```
-
-## File Format Handling
-
-### Supported Input Formats
-- **BED files**: Standard genomic interval format
-- **narrowPeak**: ENCODE narrow peak format
-- **broadPeak**: ENCODE broad peak format
-- **HOMER peak files**: Output from HOMER peak calling
-
-### Converting Between Formats
-
-Convert MACS2 output to HOMER format:
-```bash
-pos2bed.pl macs2_peaks.xls > peaks.bed
-```
-
-Convert narrowPeak to BED:
-```bash
-cut -f1-6 narrowPeak_file.narrowPeak > peaks.bed
-```
-
-## Genome Assembly Support
-
-HOMER supports multiple genome assemblies. Common assemblies include:
-- **Human**: hg38, hg19, hg18
-- **Mouse**: mm10, mm9
-- **Other**: dm6 (fly), ce10 (worm), rn6 (rat)
-
-To check available genomes:
-```bash
-findMotifsGenome.pl -list
+findMotifsGenome.pl <target_peaks> <genome> <output_dir> -bg <control_peaks> -size 200 -p 8 -noknown > motif.log 2>&1
 ```
 
 ## Quality Control and Best Practices
@@ -110,21 +121,6 @@ findMotifsGenome.pl -list
 - **Motif length**: 8-12bp for most transcription factors
 - **Number of motifs**: 10-25 for initial discovery
 - **Threads**: Use available CPU cores for faster processing
-
-## Output Interpretation
-
-### Key Output Files
-- `homerResults.html`: De novo motif discovery results
-- `motif<number>.motif`: Individual motif files
-- `seq.autonorm.tsv`: Sequence composition statistics
-- `motifFindingParameters.txt`: Parameters used for analysis
-
-### Important Metrics
-- **p-value**: Statistical significance of motif enrichment
-- **% of targets**: Percentage of input sequences containing motif
-- **% of background**: Percentage of background sequences containing motif
-- **Log P-value**: -log10(p-value) for visualization
-- **Information content**: Measure of motif specificity
 
 ## Troubleshooting
 
@@ -144,15 +140,15 @@ findMotifsGenome.pl -list
 
 ### Multi-length Motif Discovery
 ```bash
-findMotifsGenome.pl peaks.bed hg38 output -len 6,8,10,12 -size 200 -p 8 -noknown
+findMotifsGenome.pl <target_peaks> <genome> <output_dir> -len 6,8,10,12 -size 200 -p 8 -noknown > motif.log 2>&1
 ```
 
 ### High-throughput Discovery
 ```bash
-findMotifsGenome.pl peaks.bed hg38 output -S 50 -p 16 -size 300 -noknown
+findMotifsGenome.pl <target_peaks> <genome> <output_dir> -S 50 -p 16 -size 300 -noknown > motif.log 2>&1
 ```
 
 ### Comparative Discovery with GC-matched Background
 ```bash
-findMotifsGenome.pl treatment.bed hg38 output -bg control.bed -gc -size 200 -p 8 -noknown
+findMotifsGenome.pl <target_peaks> <genome> <output_dir> -bg <control_peaks> -gc -size 200 -p 8 -noknown > motif.log 2>&1
 ```

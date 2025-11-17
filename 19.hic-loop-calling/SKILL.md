@@ -1,6 +1,6 @@
 ---
 name: hic-loop-calling
-description: This skill performs chromatin loop detection from Hi-C .mcool files using HiCExplorer's hicDetectLoops and generates IGV-ready interaction tracks for visualization.
+description: This skill performs chromatin loop detection from Hi-C .mcool files using cooltools.
 ---
 
 # Hi-C Loop Calling
@@ -8,12 +8,13 @@ description: This skill performs chromatin loop detection from Hi-C .mcool files
 ## Overview
 
 This skill provides a minimal and efficient workflow for detecting chromatin loops from Hi-C data stored in .mcool format and preparing results for visualization in IGV. The key steps involved include:
-
 - Refer to the **Inputs & Outputs** section to verify required files and output structure.
-- **Data Preparation**: Ensure .mcool files are formatted correctly and resolutions are verified.
-- **Always prompt user** for resolution used to call loops.
+- **Always prompt user** for genome assembly used.
+- **Always prompt user** for resolution used to call cloops.
+- **Rename chromosomes** in the .mcool or .cool file to satisfy the chromosome format with "chr".
+- Generate chromosome-arm view files for compartment calling **after changing the chromosome name**.
 - **Extract contact matrices** from .mcool files at the desired resolution.
-- **Detect chromatin loops** using `hicDetectLoops` from HiCExplorer.
+- **Detect chromatin loops** using `cooltools`.
 
 ---
 
@@ -31,13 +32,16 @@ Use this skill when:
 
 - **File format:** .mcool (Hi-C data file).
 - **Resolution:** Choose the desired resolution for loop calling (e.g., 5 kb, 10 kb, etc.).
-- **Target region:** Genome region for loop detection, if applicable.
 
 ### Outputs
 
 ```bash
 loop_calling/
-    ${sample}_loops_${res}.bedpe  # Detected chromatin loops in BEDPE format.
+    loops/
+        ${sample}_loops_${res}.bedpe  # Detected chromatin loops in BEDPE format.
+    temp/
+        view_${genome}.tsv
+        ${sample}.expected.cis.${res}.tsv 
 ```
 ---
 
@@ -51,14 +55,40 @@ Select the desired resolution (e.g., 5 kb) and extract it using `cooler`. First,
 cooler ls <input.mcool>
 ```
 
-This ensures the selected resolution is available for loop detection.
+### Step 2: Modify the chromosome name in .mcool file
 
-### Step 2: Detect Chromatin Loops with `hicDetectLoops`
+**Python Example:**
+```python
+import cooler
+clr = cooler.Cooler(f'input.mcool::/resolutions/{resoluton}')
+rename_dict = {chrom:f"chr{chrom}" for chrom in clr.chromnames if not chrom.startswith('chr')}
+cooler.rename_chroms(clr, rename_dict)
+```
 
-Use HiCExplorer's `hicDetectLoops` to identify statistically significant loops.
+### Step 3: Create Chromosome-Arm View
+
+Generate a view file defining chromosome arms (based on centromere positions). Change chromosome name in the .mcool or .cool file if not consistent with those in the .fa file using `cooler.rename_chroms`.
+
+**Python Example:**
+```python
+import bioframe, cooler
+
+hg38_chromsizes = bioframe.fetch_chromsizes('hg38') # change the genome name according to user feedback
+hg38_cens = bioframe.fetch_centromeres('hg38')
+view_hg38 = bioframe.make_chromarms(hg38_chromsizes, hg38_cens)
+
+clr = cooler.Cooler(f'input.mcool::/resolutions/{res}')
+view_hg38 = view_hg38[view_hg38.chrom.isin(clr.chromnames)]
+view_hg38.to_csv('view_hg38.tsv', sep='	', header=False, index=False)
+```
+
+### Step 4: Detect Chromatin Loops with `cooltool`
 
 ```bash
-hicDetectLoops -m input.mcool::/resolutions/<res> -o <sample>_loops_<res>.bedpe -p 0.05
+cooltools expected-cis --nproc 6 -o <sample>.expected.cis.<res>.tsv --view "view_hg38.tsv" <sample>.mcool::resolutions/<res>
+cooltools dots --nproc 6 -o <sample>_loops_<res>.bedpe --view view_hg38.tsv <sample>.mcool::resolutions/<res> <sample>.expected.cis.<res>.tsv
+# Remove header (first line) from the bedpe file, if present
+sed -i '1{/^chrom1\tstart1\tend1\tchrom2\tstart2\tend2.*/d}' <sample>_loops_<res>.bedpe
 ```
 
 **Notes:**

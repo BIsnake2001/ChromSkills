@@ -8,7 +8,7 @@ description: This skill performs differential DNA methylation analysis (DMRs and
 ## Overview
 
 - Refer to the **Inputs & Outputs** section to check available inputs and design the output structure.
-- **Always prompt user** for which columns in the BED files are methylation fraction/percent. Never dicide by yourself.
+- **Always prompt user** for which columns in the BED files are methylation fraction/percent. Never decide by yourself.
 - Convert heterogeneous inputs to a **per‑sample 4‑column Metilene table** (chrom, start, end, methylation_fraction). Sort the BED files after conversion.
 - Generate the merged bed file as the input of metilene.
 - **Run metilene**: call DMRs and DMCs with tunable parameters

@@ -36,7 +36,7 @@ Use this skill when:
 
 - **File format:** .mcool, .cool, or .hic (Hi-C data file).
 - **Resolution:** Provided by user. ~10-50 kb is recommended. Default is 25 kb.
-- **Target region:** Genome region provided by user to visualize TADs (e.g., `"chr17:1000000-2000000"`).
+- **Target region:** Genome region provided by user to visualize TADs (e.g., `"chr22:1000000-2000000"`).
 
 ### Outputs
 
@@ -56,7 +56,7 @@ TAD_calling/
 
 ## Allowed Tools
 
-When using this skill, you should restrict yourself to the following MCP tools from server `cooler-tools`, `cooltools-tools`, `plot-tools`, `project-init-tools`, `genome-locate-tools`:
+When using this skill, you should restrict yourself to the following MCP tools from server `cooler-tools`, `cooltools-tools`, `project-init-tools`, `genome-locate-tools`:
 - `mcp__project-init-tools__project_init`
 - `mcp__genome-locate-tools__genome_locate_fasta`
 - `mcp__HiCExplorer-tools__hic_to_mcool`
@@ -154,18 +154,18 @@ Else, use `${resolution}`.
 
 Use `mcp__HiCExplorer-tools__run_hicFindTADs` for comprehensive TAD identification. Customize parameters to suit the resolution and depth of your Hi-C data:
 Before calling the tool, **ask the user** for the following parameters:
-- `${min_depth}`: Minimum window size (e.g. 3x bin size, default 75000)
-- `${max_depth}`: Maximum window size (e.g. 6-10x bin size, default 250000, must be at least 5 times larger than the resolution)
-- `${step}`: Step size for sliding window (default 25000)
+- `${min_depth}`: Minimum window size (e.g. 3x bin size, default 150000)
+- `${max_depth}`: Maximum window size (e.g. 6-10x bin size, default 300000, must be at least 5 times larger than the resolution)
+- `${step}`: Step size for sliding window (default 50000, 25000 is the best but memory-consuming)
 - `${multiple_testing}`: Multiple testing correction method (e.g. 'fdr')
 - `${threshold_comparisons}`: FDR threshold for significant TADs (default 0.05)
 - `${delta}`: Delta parameter for TAD boundary detection (default 0.01)
-- `${chromosomes}`: Chromosomes to call TADs (default `chr15 chr17`)
+- `${chromosomes}`: Chromosomes to call TADs (default `chr21 chr22`). It is suggested to call TADs on a certain chromosome because it is memory-consuming to call TADs on all chromosomes and this process would likely be killed by the system.
 
 Call:
 - `mcp__HiCExplorer-tools__run_hicFindTADs`
 with:
-- `mcool_uri`: `${mcool_uri}`
+- `mcool_uri`: `${mcool_uri}`, mcool URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
 - `sample`: `${sample}`
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_TAD_calling` directory returned by `mcp__project-init-tools__project_init`.
 - `min_depth`: `${min_depth}`
@@ -174,6 +174,7 @@ with:
 - `multiple_testing`: `${multiple_testing}`
 - `threshold_comparisons`: `${threshold_comparisons}`
 - `delta`: `${delta}`
+- `chromosomes`: chromosomes to call TADs, e.g. `chr21 chr22`, space-separated list.
 
 The tool will:
 - Call `mcp__HiCExplorer-tools__run_hicFindTADs` to identify TADs.
@@ -189,9 +190,13 @@ Call:
 - `mcp__HiCExplorer-tools__generate_track_ini`
 
 with:
-- `mcool_uri`: `${mcool_uri}`
 - `sample`: `${sample}`
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_TAD_calling` directory returned by `mcp__project-init-tools__project_init`.
+- `mcool_uri`: `${mcool_uri}`, mcool URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `depth`: depth for the Hi-C matrix view, e.g. 1500000
+- `min_value`: minimum value for the Hi-C matrix view, e.g. 0.0
+- `max_value`: maximum value for the Hi-C matrix view, e.g. 80.0
+
 
 The tool will:
 - Generate the `<track.ini>` file under `${proj_dir}/temp/` directory.
@@ -200,7 +205,7 @@ The tool will:
 ---
 
 2. Contact Maps with TAD Overlays
-Before calling the tool, **ask the user** for the target region, like `"chr17:1000000-2000000"`.
+Before calling the tool, **ask the user** for the target region, like `"chr22:1000000-2000000"`.
 
 Call:
 - `mcp__HiCExplorer-tools__plot_tads_region`
@@ -208,7 +213,7 @@ Call:
 with:
 - `sample`: `${sample}`
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_TAD_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `region`: user-provided target region, like `"chr17:1000000-2000000"`
+- `region`: user-provided target region, like `"chr22:1000000-2000000"`
 - `dpi`: dpi for the contact map, default is 300
 
 The tool will:
@@ -216,3 +221,8 @@ The tool will:
 - Return the path of the contact map file under `${proj_dir}/plots/` directory.
 
 ---
+
+
+# Best Practices
+
+- It is suggested to call TADs on a certain chromosome because it is memory-consuming to call TADs on all chromosomes and this process would likely be killed by the system.

@@ -35,7 +35,7 @@ Use this skill when:
 ### Inputs
 
 - **File format:** .mcool, .cool, or .hic (Hi-C data file).
-- **Resolution:** Provided by user. ~10-50 kb is recommended. Default is 25 kb.
+- **Resolution:** Provided by user. ~10-50 kb is recommended. Default is 50 kb. 25 kb is the best but memory-consuming.
 - **Target region:** Genome region provided by user to visualize TADs (e.g., `"chr22:1000000-2000000"`).
 
 ### Outputs
@@ -82,11 +82,11 @@ Before calling any tool, ask the user:
 2. Genome assembly (`genome`): e.g. `hg38`, `mm10`, `danRer11`.  
    - **Never** guess or auto-detect.
 3. Hi-C matrix path/URI (`mcool_uri`): e.g. `.mcool` file path or `.hic` file path.
-   - `path/to/sample.mcool::/resolutions/25000`  
+   - `path/to/sample.mcool::/resolutions/50000`  
    - or `.cool` file path
    - or `.hic` file path
-4. Resolution (`resolution`): default `25000` (25 kb).  
-   - If user does not specify, use `25000` as default.
+4. Resolution (`resolution`): default `50000` (50 kb).  
+   - If user does not specify, use `50000` as default.
    - Must be the same as the resolution used for `${mcool_uri}`
 
 ---
@@ -119,7 +119,7 @@ with:
 - `input_hic`: the user-provided path (e.g. `input.hic`)
 - `sample`: the user-provided sample name
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_TAD_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `resolutions`: the user-provided resolutions (e.g. `[25000]`)
+- `resolutions`: the user-provided resolutions (e.g. `[50000]`)
 
 The tool will:
 - Convert the `.hic` file to `.mcool` file.
@@ -160,7 +160,7 @@ Before calling the tool, **ask the user** for the following parameters:
 - `${multiple_testing}`: Multiple testing correction method (e.g. 'fdr')
 - `${threshold_comparisons}`: FDR threshold for significant TADs (default 0.05)
 - `${delta}`: Delta parameter for TAD boundary detection (default 0.01)
-- `${chromosomes}`: Chromosomes to call TADs (default `chr21 chr22`). It is suggested to call TADs on a certain chromosome because it is memory-consuming to call TADs on all chromosomes and this process would likely be killed by the system.
+- `${chromosomes}`: Chromosomes to call TADs (default `chr22`). It is suggested to call TADs on a certain chromosome because it is memory-consuming to call TADs on all chromosomes and this process would likely be killed by the system.
 
 Call:
 - `mcp__HiCExplorer-tools__run_hicFindTADs`
@@ -174,7 +174,7 @@ with:
 - `multiple_testing`: `${multiple_testing}`
 - `threshold_comparisons`: `${threshold_comparisons}`
 - `delta`: `${delta}`
-- `chromosomes`: chromosomes to call TADs, e.g. `chr21 chr22`, space-separated list.
+- `chromosomes`: chromosomes to call TADs, e.g. `chr22`, space-separated list.
 
 The tool will:
 - Call `mcp__HiCExplorer-tools__run_hicFindTADs` to identify TADs.

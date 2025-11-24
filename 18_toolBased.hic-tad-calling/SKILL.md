@@ -41,7 +41,7 @@ Use this skill when:
 ### Outputs
 
 ```bash
-TAD_calling/
+${sample}_TAD_calling/
     TADs/
         ${sample}_TAD_boundaries.bed  # Called TADs in BED format
         ${sample}_TAD_boundaries.gff

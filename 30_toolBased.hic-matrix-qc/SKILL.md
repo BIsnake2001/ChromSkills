@@ -45,7 +45,7 @@ Optional: Multiple Hi-C matrices for replicate QC
 ### Outputs
 
 ```bash
-hic_qc/
+${sample}_hic_matrix_qc/
   logs/
     hic_qc.log               # Commands, parameters, and software versions
   metrics/
@@ -88,7 +88,7 @@ Do NOT fall back to:
 
 Before calling any tool, ask the user:
 
-1. Sample name (`sample`): used as prefix and for the output directory `${sample}_loop_calling`.
+1. Sample name (`sample`): used as prefix and for the output directory `${sample}_hic_matrix_qc`.
 
 2. Genome assembly (`genome`): e.g. `hg38`, `mm10`, `danRer11`.  
    - **Never** guess or auto-detect.

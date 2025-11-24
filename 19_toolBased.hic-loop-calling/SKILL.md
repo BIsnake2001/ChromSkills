@@ -38,7 +38,7 @@ Use this skill when:
 ### Outputs
 
 ```bash
-loop_calling/
+${sample}_loop_calling/
     loops/
         ${sample}_loops_${resolution}.bedpe  # Detected chromatin loops in BEDPE format.
     temp/
@@ -49,7 +49,7 @@ loop_calling/
 
 ## Allowed Tools
 
-When using this skill, you should restrict yourself to the following MCP tools from server `cooler-tools`, `cooltools-tools`, `plot-tools`, `project-init-tools`, `genome-locate-tools`:
+When using this skill, you should restrict yourself to the following MCP tools from server `cooler-tools`, `cooltools-tools`, `project-init-tools`, `genome-locate-tools`:
 - `mcp__project-init-tools__project_init`
 - `mcp__genome-locate-tools__genome_locate_fasta`
 - `mcp__HiCExplorer-tools__hic_to_mcool`

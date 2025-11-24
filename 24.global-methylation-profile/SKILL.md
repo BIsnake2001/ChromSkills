@@ -12,11 +12,11 @@ Main steps include:
 - Refer to the **Inputs & Outputs** section to check available inputs and design the output structure.  
 - **Always prompt user** for genome assembly used.
 - **Always prompt user** for which columns are methylation fraction/percent and coverage and strand.
-- For multi-sample datasets, prepare the matrix of methylation data.
 - Analyze the genomic feature distribution of methylations for each sample.
 - Compute and visualize genome-wide methylation density distributions.
+- For multi-sample datasets, prepare the matrix of methylation data.
 - Perform PCA and hierarchical clustering to assess sample similarity based on global methylation.
-
+- **Never use MCP tools in this skill**, use R scripts instead.
 ---
 
 ## When to use this skill
@@ -145,9 +145,8 @@ gene.obj <- GRangesList(
   ... # other features
 )
 
-sample_ids <- filtered.myobj@sample.ids
 for (i in seq_along(filtered.myobj)) {
-  sample_id <- sample_ids[i]
+  sample_id <- filtered.myobj[[i]]@sample.id
   cpg.gr <- as(filtered.myobj[[i]], "GRanges")
   ann.gene <- annotateWithGeneParts(cpg.gr, gene.obj)
   feature.summary <- getTargetAnnotationStats(ann.gene, percentage = TRUE)
@@ -194,6 +193,7 @@ ggplot(df.long, aes(x = Methylation, color = Sample)) +
 meth.mat <- percMethylation(meth)
 
 # (Optional) Filter CpGs by variability
+cpg.sd <- apply(meth.mat, 1, sd, na.rm = TRUE)
 keep.var <- cpg.sd > 0
 meth.var <- meth.mat[keep.var, ]
 if (sum(keep.var) > 10000) {

@@ -56,7 +56,7 @@ awk -F'\t' 'BEGIN {OFS="\t"} {print $1, $2, $3, "peak_"NR, "*", "+"}' dmr_result
 ### Step 2: Annotate the differential methylation regions to the gene promoter.
 Call:
 
-- mcp__homer-tools__homer_annotate_peaks
+- mcp__homer-tools__homer_simple_annotate_peaks
 
 with:
 - `peaks_path`: 6-column standard format BED file from Step 1.

@@ -12,10 +12,9 @@ Main steps include:
 - Refer to the **Inputs & Outputs** section to check available inputs and design the output structure.  
 - **Always prompt user** for genome assembly used.
 - **Always prompt user** for which columns are methylation fraction/percent and coverage and strand.
-- Prepare the raw methylation BED into 6-column standard format BED file received by HOMER.
+- For multi-sample datasets, prepare the matrix of methylation data.
 - Analyze the genomic feature distribution of methylations for each sample.
 - Compute and visualize genome-wide methylation density distributions.
-- For multi-sample datasets, prepare the matrix of methylation data.
 - Perform PCA and hierarchical clustering to assess sample similarity based on global methylation.
 
 ---

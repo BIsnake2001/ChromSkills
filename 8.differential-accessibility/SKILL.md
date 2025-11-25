@@ -10,8 +10,10 @@ description: The differential-accessibility pipeline is designed to identify gen
 This skill performs differential accessibility analysis between conditions.  
 Main steps include:
 
-- Refer to the **Inputs & Outputs** section to check inputs and build the output architecture.
-- **Always wait the user feedback** if required files are not available in the current working directory by asking "${files} not available, provide required files or skip and proceed ?" 
+- Initialize the project directory.
+- Refer to the **Inputs & Outputs** section to check inputs and build the output architecture. All the output file should located in `${proj_dir}` in Step 0.
+- **Always prompt user** if required files are missing.
+- **Always prompt user** for the threshold of `qvalues` and `log2foldchange` to define significant regions.
 - Merge peaks across replicates or samples to build a consensus peak set.  
 - Generate read count matrix over peaks using featureCounts or bedtools.  
 - Prepare sample metadata file describing conditions and replicates.  
@@ -46,7 +48,7 @@ The pipeline performs best with datasets containing biological replicates (≥2 
 ### Outputs
 
 ```bash
-DAR_analysis/
+${sample}_DAR_analysis/
     tables/
       all_peaks.bed
       consensus_peaks.bed # Unified peak set
@@ -67,30 +69,52 @@ DAR_analysis/
 
 ## Decision Tree
 
+### Step 0: Initialize Project
+
+1. Make director for this project:
+
+Call:
+
+- `mcp__project-init-tools__project_init`
+
+with:
+
+- `sample`: sample name (e.g. c1_vs_c2)
+- `task`: DAR_analysis
+
+The tool will:
+
+- Create `${sample}_DAR_analysis` directory.
+- Return the full path of the `${sample}_DAR_analysis` directory, which will be used as `${proj_dir}`.
+
+
 ### Step 1: Generate Consensus Peaks
 
 Combine peaks from replicates to define a shared feature space.
+Call:
+- mcp__pydeseq2-tools__generate_consensus_peaks
+with:
+- `bed_files`: List of paths to peak BED files from replicates.
+- `output_bed`: Output path for the merged consensus BED file.
+- `output_saf`: Output path for the SAF file (needed for featureCounts)
 
-```bash
-# Merge replicate peaks
-cat <rep1_peaks.bed>  <rep2_peaks.bed> | sort -k1,1 -k2,,2n input.bed > all_peaks.bed
-bedtools merge -i <rep1_peaks.bed> <rep2_peaks.bed> > consensus_peaks.bed
-```
 
-Output: `consensus_peaks.bed`
+Output: `consensus_peaks.bed`, `consensus_peaks.saf`
 
 ---
 
 ### Step 2: Generate Count Matrix
 
-Count reads overlapping each consensus peak.
+Call:
+- mcp__pydeseq2-tools__count_reads_featurecounts
 
-```bash
-awk 'BEGIN{OFS="\t"; print "GeneID","Chr","Start","End","Strand"} {print "peak_"NR, $1, $2+1, $3, "."}' consensus_peaks.bed > consensus_peaks.saf
+with:
 
-# the -p -B -C parameter for featureCounts is for pair-end reads
-featureCounts -a consensus_peaks.saf -F SAF -o atac_counts.txt -T 8  -p -B -C sample1.bam sample2.bam sample3.bam
-```
+- `saf_file`: SAF file output from Step 1.
+- `bam_files`: List of paths to BAM files.
+- `output_counts`: Path to output count matrix.
+- `is_paired_end`: Whether the BAM file is pair end or not.
+- `threads`
 
 Output: `atac_counts.txt`
 
@@ -102,84 +126,62 @@ Prepare `samples.csv` describing condition and replicate information.
 
 ```csv
 sample,condition,replicate
-sample1,c1,1
-sample2,c1,2
-sample3,c2,1
-sample4,c2,2
+sample1.bam,c1,1
+sample2.bam,c1,2
+sample3.bam,c2,1
+sample4.bam,c2,2
 ```
 
 ---
 
-### Step 4: Differential Accessibility with DESeq2
+### Step 4: Differential Accessibility with pyDESeq2
 
-Run DESeq2 in R for normalization, dispersion estimation, and statistical testing.
+Call: 
 
-```r
-library(DESeq2)
+- mcp__pydeseq2-tools__run_pydeseq2_analysis
 
-counts <- read.table("atac_counts.txt", header=TRUE, row.names=1)
-colData <- read.csv("samples.csv", row.names=1)
-counts_matrix <- counts[, -c(1:6)]   # Keep only the count columns
-
-dds <- DESeqDataSetFromMatrix(countData=counts_matrix,
-                              colData=colData,
-                              design=~condition)
-dds <- dds[rowSums(counts(dds)) >= 10, ]
-dds <- DESeq(dds)
-
-res <- results(dds, contrast=c("condition","c1","c2"))
-
-region_info <- region_info[rownames(dds), ]
-res_df <- as.data.frame(res)
-res_df$GeneID <- rownames(res_df)
-res_with_coords <- cbind(region_info, res_df)
-
-write.csv(as.data.frame(res), "DAR_results.csv") # output DAR results with region loci
-
-```
+with: 
+- counts_file: Path to featureCounts from Step 2.
+- metadata_file: Path to metadata CSV from Step 3.
+- design_factors: Design formula columns (e.g. 'condition' or 'batch,condition').
+- contrast_column: Column name for contrast (e.g. 'condition').
+- contrast_control: Control group name (e.g. 'Control').
+- contrast_treatment: Treatment group name (e.g. 'Treated').
+- output_csv: Output path for results CSV.
 
 Output: `DAR_results.csv`
 
 ---
 
 ### Step 5: Visualization and QC
+Call:
 
-1) PCA Plot
+- mcp__pydeseq2-tools__visualize_results
 
-```r
-vsd <- vst(dds, blind=FALSE)
-plotPCA(vsd, intgroup="condition")
-```
+with:
+- `results_csv`: Path to DESeq2 results CSV.
+- `counts_file`: Path to original counts file (for PCA).
+- `metadata_file`: Path to metadata (for PCA grouping).
+- `output_dir`: Directory to save plots.
+- `condition_col`: (e.g."condition")
 
-2) Volcano Plot
-
-```r
-library(EnhancedVolcano)
-EnhancedVolcano(res, lab=rownames(res),
-                x='log2FoldChange', y='pvalue',
-                pCutoff=0.05, FCcutoff=1,
-                title='"c1 vs c2')
-```
 
 ---
 
 ### Step 6: Output significantly up and down accessible regions
 
-```r
-sig <- subset(res_with_coords, !is.na(padj) & padj < 0.05)
+Call:
 
-to_bed4 <- function(df) {
-  data.frame(chr = df$Chr,
-             start = as.integer(df$Start - 1),  # SAF -> BED
-             end = as.integer(df$End),
-             name = df$GeneID,
-             check.names = FALSE)
-}
+- mcp__pydeseq2-tools__filter_and_export_bed
 
-write.table(to_bed4(sig),  "DAR_sig.bed",  sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
-write.table(to_bed4(subset(sig, log2FoldChange > 0)), "DAR_up.bed",  sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
-write.table(to_bed4(subset(sig, log2FoldChange < 0)), "DAR_down.bed",sep="\t", quote=FALSE, col.names=FALSE, row.names=FALSE)
-```
+with:
+
+- `results_csv`: Path to DESeq2 results CSV.
+- `output_prefix`: Prefix for output BED files.
+- `padj_cutoff`: Provided by user
+- `log2fc_cutoff`: Provided by user
+
+
 Output: `DAR_sig.bed` `DAR_up.bed` `DAR_down.bed`
 
 ## Advanced Usage

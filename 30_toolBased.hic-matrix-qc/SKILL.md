@@ -94,7 +94,7 @@ Before calling any tool, ask the user:
    - **Never** guess or auto-detect.
 
 3. Hi-C matrix path/URI (`mcool_uri`):
-   - `path/to/sample.mcool::/resolutions/100000`  
+   - `path/to/sample.mcool::/resolutions/100000` (.mcool file with resolution specified)
    - or `.cool` file path
    - or `.hic` file path
 
@@ -190,16 +190,15 @@ Call:
 - `mcp__cooler-tools__harmonize_chrom_names`
 
 with:
-
-- `mcool_uri`: the user-provided URI (e.g. `input.mcool::/resolutions/${resolution}`)
-- `out_uri` (optional):
-  - If the user wants a new output cooler, set `out_uri` to a new URI/path.
-  - Otherwise, leave `out_uri` as `null` (or omit) to allow in-place behavior.
+- `sample`: the user-provided sample name
+- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 
 The tool will:
 - Check if the chromosome names in the .mcool file.
 - If not, harmonize the chromosome names in the .mcool file.
-- If the chromosome names are modified, return the path of the modified .mcool file under `${proj_dir}/` directory.
+- If the chromosome names are modified, return the path of the modified .mcool file under `${proj_dir}/` directory
 
 ---
 
@@ -214,7 +213,8 @@ Call:
 
 with:
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_hic_matrix_qc` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: mcool URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `clr_weight_name`: name of the weight column (default: `weight`)
 - `cis_column`: name of the cis column (default: `cov_cis_weight`)
 - `total_column`: name of the total column (default: `cov_tot_weight`)
@@ -263,7 +263,8 @@ with:
 
 - `sample`: the user-provided sample name
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_hic_matrix_qc` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: (possibly renamed) cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `genome`: the user-provided genome assembly
 
 The tool will:
@@ -282,7 +283,8 @@ Call:
 with:
 - `sample`: the user-provided sample name
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_hic_matrix_qc` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI with resolution specified (e.g. `input.mcool::/resolutions/${resolution}`)
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `view_path`: the path to the view file (e.g. `${proj_dir}/temp/view_${genome}.tsv`)
 - `expected_cis_tsv`: the path to the expected cis file (e.g. `${proj_dir}/temp/expected_cis.${resolution}.tsv`)
 - `clr_weight_name`: the name of the weight column (default: `weight`)
@@ -302,7 +304,8 @@ Call:
 with:
 - `sample`: the user-provided sample name
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_hic_matrix_qc` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI with resolution specified (e.g. `input.mcool::/resolutions/${resolution}`)
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 
 The tool will:
 - Plot the P(s) curve (log–log distance vs expected contacts)

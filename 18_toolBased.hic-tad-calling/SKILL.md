@@ -82,7 +82,7 @@ Before calling any tool, ask the user:
 2. Genome assembly (`genome`): e.g. `hg38`, `mm10`, `danRer11`.  
    - **Never** guess or auto-detect.
 3. Hi-C matrix path/URI (`mcool_uri`): e.g. `.mcool` file path or `.hic` file path.
-   - `path/to/sample.mcool::/resolutions/50000`  
+   - `path/to/sample.mcool::/resolutions/50000` (.mcool file with resolution specified)
    - or `.cool` file path
    - or `.hic` file path
 4. Resolution (`resolution`): default `50000` (50 kb).  
@@ -154,8 +154,8 @@ Else, use `${resolution}`.
 
 Use `mcp__HiCExplorer-tools__run_hicFindTADs` for comprehensive TAD identification. Customize parameters to suit the resolution and depth of your Hi-C data:
 Before calling the tool, **ask the user** for the following parameters:
-- `${min_depth}`: Minimum window size (e.g. 3x bin size, default 150000)
-- `${max_depth}`: Maximum window size (e.g. 6-10x bin size, default 300000, must be at least 5 times larger than the resolution)
+- `${min_depth}`: Minimum window size (e.g. 3x resolution, default 150000, must be at least 3 times larger than the resolution)
+- `${max_depth}`: Maximum window size (e.g. 6-10x resolution, default 300000, must be at least 5 times larger than the resolution)
 - `${step}`: Step size for sliding window (default 50000, 25000 is the best but memory-consuming)
 - `${multiple_testing}`: Multiple testing correction method (e.g. 'fdr')
 - `${threshold_comparisons}`: FDR threshold for significant TADs (default 0.05)
@@ -165,12 +165,13 @@ Before calling the tool, **ask the user** for the following parameters:
 Call:
 - `mcp__HiCExplorer-tools__run_hicFindTADs`
 with:
-- `mcool_uri`: `${mcool_uri}`, mcool URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
 - `sample`: `${sample}`
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_TAD_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `min_depth`: `${min_depth}`
-- `max_depth`: `${max_depth}`
-- `step`: `${step}`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
+- `min_depth`: `${min_depth}`, must be at least 3 times larger than the resolution.
+- `max_depth`: `${max_depth}`, must be at least 5 times larger than the resolution.
+ `step`: `${step}`
 - `multiple_testing`: `${multiple_testing}`
 - `threshold_comparisons`: `${threshold_comparisons}`
 - `delta`: `${delta}`
@@ -192,11 +193,11 @@ Call:
 with:
 - `sample`: `${sample}`
 - `proj_dir`: directory to save the view file. In this skill, it is the full path of the `${sample}_TAD_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: `${mcool_uri}`, mcool URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `depth`: depth for the Hi-C matrix view, e.g. 1500000
 - `min_value`: minimum value for the Hi-C matrix view, e.g. 0.0
 - `max_value`: maximum value for the Hi-C matrix view, e.g. 80.0
-
 
 The tool will:
 - Generate the `<track.ini>` file under `${proj_dir}/temp/` directory.

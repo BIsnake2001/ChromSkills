@@ -1,6 +1,6 @@
 ---
 name: hic-compartments-calling
-description: This skill performs PCA-based A/B compartments calling on Hi-C .mcool datasets using pre-defined MCP tools from the cooler-tools, cooltools-tools, and plot-tools servers.
+description: This skill performs PCA-based A/B compartments calling on Hi-C .mcool datasets using pre-defined MCP tools from the cooler-tools, cooltools-tools, and plot-hic-tools servers.
 ---
 # Hi-C Compartments Calling (MCP-based)
 
@@ -56,7 +56,7 @@ ${sample}_Compartments_calling/
 
 ## Allowed Tools
 
-When using this skill, you should restrict yourself to the following MCP tools from server `cooler-tools`, `cooltools-tools`, `plot-tools`, `project-init-tools`, `genome-locate-tools`:
+When using this skill, you should restrict yourself to the following MCP tools from server `cooler-tools`, `cooltools-tools`, `plot-hic-tools`, `project-init-tools`, `genome-locate-tools`:
 - `mcp__project-init-tools__project_init`
 - `mcp__genome-locate-tools__genome_locate_fasta`
 - `mcp__HiCExplorer-tools__hic_to_mcool`
@@ -68,7 +68,7 @@ When using this skill, you should restrict yourself to the following MCP tools f
 - `mcp__cooltools-tools__run_expected_cis`
 - `mcp__cooltools-tools__run_eigs_cis`
 - `mcp__cooltools-tools__run_saddle`
-- `mcp__plot-tools__plot_saddle_pdf`
+- `mcp__plot-hic-tools__plot_saddle_pdf`
 
 Do NOT fall back to:
 
@@ -89,7 +89,7 @@ Before calling any tool, ask the user:
    - **Never** guess or auto-detect.
 
 3. Hi-C matrix path/URI (`mcool_uri`): e.g. `.mcool` file path or `.hic` file path.
-   - `path/to/sample.mcool::/resolutions/100000`  
+   - `path/to/sample.mcool::/resolutions/100000` (.mcool file with resolution specified)
    - or `.cool` file path
    - or `.hic` file path
 
@@ -187,13 +187,14 @@ Call:
 
 with:
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI (e.g. `input.mcool::/resolutions/${resolution}`)
+- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 
 The tool will:
 - Check if the chromosome names in the .mcool file.
 - If not, harmonize the chromosome names in the .mcool file.
-- If the chromosome names are modified, return the path of the modified .mcool file under `${proj_dir}/` directory.
+- If the chromosome names are modified, return the path of the modified .mcool file under `${proj_dir}/` directory
 
 ---
 
@@ -208,8 +209,9 @@ Call:
 
 with:
 
-- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: (possibly renamed) cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `genome`: genome assembly
 
 The tool will:
@@ -229,8 +231,9 @@ Call:
 - `mcp__cooler-tools__dump_bins_for_gc`
 with:
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the GC track file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI with resolution specified (e.g. `input.mcool::/resolutions/${resolution}`)
+- `proj_dir`: directory to save the GC track file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 
 The tool will:
 - Dump bins at the specified resolution from the cooler.
@@ -246,8 +249,9 @@ Call:
 with:
 
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the GC track file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI (e.g. `input.mcool::/resolutions/${resolution}`)
+- `proj_dir`: directory to save the GC track file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `genome`: genome assembly
 
 The tool will:
@@ -267,8 +271,9 @@ Call:
 
 with:
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI (e.g. `input.mcool::/resolutions/${resolution}`)
+- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `view_path`: the path to the view file (e.g. `${proj_dir}/temp/view_${genome}.tsv`)
 - `clr_weight_name`: the name of the weight column (default: `weight`)
 - `ignore_diags`: the number of diagonals to ignore based on resolution
@@ -287,8 +292,9 @@ Call:
 with:
 
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI (e.g. `input.mcool::/resolutions/${resolution}`)
+- `proj_dir`: directory to save the expected-cis and eigs-cis files. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `view_path`: the view TSV from Step 3 (e.g. `view_${genome}.tsv`)
 - `gc_tsv`: GC track TSV from Step 4
 - `clr_weight_name`: balancing column name (default `"weight"`, but can be set based on `clr.bins().columns` if the user tells you the correct name)
@@ -318,12 +324,12 @@ Call:
 with:
 
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the saddle file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`.
-- `mcool_uri`: the user-provided URI with resolution specified (e.g. `input.mcool::/resolutions/${resolution}`)
+- `proj_dir`: directory to save the saddle file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `mcool_uri`: cooler URI with resolution specified, e.g. `input.mcool::/resolutions/${resolution}`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `view_path`: the view TSV from Step 3 (e.g. `view_${genome}.tsv`)
 - `eigs_vecs_tsv`: the eigs-cis vecs TSV from Step 5 (e.g. `compartments/eigs.${resolution}.cis.vecs.tsv`)
 - `expected_cis_tsv`: the expected-cis TSV from Step 5 (e.g. `temp/expected_cis.${resolution}.tsv`)
-- `resolution`: `${resolution}`
 - `clr_weight_name`: balancing column name (default `"weight"`, but can be set based on `clr.bins().columns` if the user tells you the correct name)
 - `qrange_low` and `qrange_high`: default `0.02` and `0.98`
 
@@ -340,13 +346,13 @@ The tool will:
 
 Call:
 
-- `mcp__plot-tools__plot_saddle_pdf`
+- `mcp__plot-hic-tools__plot_saddle_pdf`
 
 with:
 
 - `sample`: the user-provided sample name
-- `proj_dir`: directory to save the saddle file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init` .
-- `resolution`: `${resolution}`
+- `proj_dir`: directory to save the saddle file. In this skill, it is the full path of the `${sample}_Compartments_calling` directory returned by `mcp__project-init-tools__project_init`
+- `resolution`: `${resolution}` must be the same as the resolution used for `${mcool_uri}` and must be an integer
 - `chr_name`: the user-provided chromosome name, e.g. `chr1`
 
 This tool will:

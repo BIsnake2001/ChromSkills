@@ -10,8 +10,9 @@ description: The TF-differential-binding pipeline performs differential transcri
 This skill enables comprehensive differential TF binding analysis using **DiffBind** in R. DiffBind integrates read counting, normalization, and statistical modeling to identify differentially bound peaks between conditions.
 
 To perform DiffBind differential binding analysis:
-- Refer to the **Inputs & Outputs** section to check inputs and build the output architecture.
-- **Always wait the user feedback** if required files are not available in the current working directory by asking "${files} not available, provide required files or skip and proceed ?" 
+- Initialize the project directory.
+- Refer to the **Inputs & Outputs** section to check inputs and build the output architecture. All the output file should located in `${proj_dir}` in Step 0.
+- **Always prompt user** if required files are missing.
 - Provide a sample sheet with ChIP-seq peak files and corresponding BAM files for each sample.
 - Construct a `DBA` object from the sample sheet.
 - Compute read counts over consensus peak regions.
@@ -43,7 +44,7 @@ Recommended applications include:
 
 ### Outputs
 ```bash
-TF_DB_analysis/
+${sample}_TF_DB_analysis/
     DBs/
       DB_results.csv # DESeq2 results (log2FC, p-values)
       DB_up.bed
@@ -59,6 +60,24 @@ TF_DB_analysis/
 ---
 
 ## Decision Tree
+
+### Step 0: Initialize Project
+
+1. Make director for this project:
+
+Call:
+
+- `mcp__project-init-tools__project_init`
+
+with:
+
+- `sample`: sample name (e.g. c1_vs_c2)
+- `task`: TF_DB
+
+The tool will:
+
+- Create `${sample}_TF_DB` directory.
+- Return the full path of the `${sample}_TF_DB` directory, which will be used as `${proj_dir}`.
 
 ### Step 1: Prepare Input Data
 

@@ -18,6 +18,7 @@ This skill enables comprehensive de novo motif discovery using HOMER tools for g
 ---
 
 ## When to use this skill
+
 Use this skill when you need to uncover sequence motifs enriched in the promoter regions of a set of genes, or directly from a set of genomic regions, such as peaks from ChIP-seq or ATAC-seq, without prior assumptions about which transcription factors are involved. Typical use cases include:
 
 - Performing motif enrichment analysis in promoters of a gene list provided by user or generated in previous analysis to infer potential transcription factors that might regulate the target genes.
@@ -43,9 +44,27 @@ Input files should be in one of the following formats:
 ${sample}_de_novo_motif_discovery/
     results/
         homerResults.html # De novo motif discovery results
-        motif<number>.motif # Individual motif files
         seq.autonorm.tsv # Sequence composition statistics
         motifFindingParameters.txt # Parameters used for analysis
+        homerMotifs.all.motifs
+        homerMotifs.motifs12
+        homerMotifs.motifs10
+        homerMotifs.motifs8
+        nonRedundant.motifs
+
+        homerResults/
+            motif1.similar1.motif
+            motif1.info.html
+            motif1.logo.svg
+            motif1.motif
+            motif1.similar.html
+            motif1.similar2.motif
+            motif1.similar3.motif
+            motif1.similar4.motif
+            motif1RV.logo.svg
+            motif1RV.motif
+            # ...
+
     logs/ # analysis logs 
         motif.log
 ```
@@ -81,8 +100,21 @@ The tool will:
 
 ---
 
+### Step 2: Prepare genome file for homer
 
-### Step 2 (Optional): Standardize chromosome names for BED files
+Call:
+- `mcp__homer-tools__check_genome_installation`
+
+With:
+- `genome`: the user-provided genome assembly, e.g. `hg38`, `mm10`, `danRer11`
+
+The tool will:
+- Check if the genome is installed in HOMER.
+- If not, install the genome.
+
+---
+
+### Step 3 (Optional): Standardize chromosome names for BED files
 
 This step is optional. Only perform this step if the input file is a BED file. If the input file is a gene list, skip this step.
 
@@ -102,8 +134,7 @@ The tool will:
 
 ---
 
-
-### Step 3: De Novo Motif Discovery
+### Step 4: De Novo Motif Discovery
 
 Here are three options for different situations. Pick one of them based on the user's request.
 
@@ -114,7 +145,7 @@ Here are three options for different situations. Pick one of them based on the u
 ### Option 1: De novo + known motifs
 
 Call:
-- `mcp__homer-tools__de_novo_motif_discovery`
+- `mcp__homer-tools__find_motifs`
 
 With:
 - `sample`: the user-provided sample name
@@ -136,7 +167,7 @@ The tool will:
 ### Option 2: De novo + known motifs + background
 
 Call:
-- `mcp__homer-tools__de_novo_motif_discovery`
+- `mcp__homer-tools__find_motifs`
 
 With:
 - `sample`: the user-provided sample name
@@ -159,7 +190,7 @@ The tool will:
 ### Option 3: De novo only
 
 Call:
-- `mcp__homer-tools__de_novo_motif_discovery`
+- `mcp__homer-tools__find_motifs`
 
 With:
 - `sample`: the user-provided sample name
@@ -179,7 +210,7 @@ The tool will:
 
 ---
 
-Here are additional parameters for calling `mcp__homer-tools__de_novo_motif_discovery` tool, which are not commonly used. Add these parameters only when necessary:
+Here are additional parameters for calling `mcp__homer-tools__find_motifs` tool, which are not commonly used. Add these parameters only when necessary:
 
 - `cpg`: Enrich for CpG islands (default: False)
 - `chopify`: Chop sequences into smaller fragments (default: False)

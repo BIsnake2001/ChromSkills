@@ -54,6 +54,7 @@ with:
 
 - `sample`: all
 - `task`: peak_calling
+- `genome`: provided by user
 
 The tool will:
 

@@ -30,8 +30,8 @@ description: This skill is used to perform genomic feature annotation and visual
 ### Inputs
 Genomic region formats supported:
 - **BED files**: Standard genomic interval format
-- **narrowPeak**: ENCODE narrow peak format
-- **broadPeak**: ENCODE broad peak format
+- **narrowPeak**: narrow peak format
+- **broadPeak**: broad peak format
 
 ### Outputs
 ```bash

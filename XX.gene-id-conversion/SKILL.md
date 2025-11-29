@@ -1,6 +1,5 @@
 ---
 
-```markdown
 name: gene-id-conversion
 description: This skill performs gene identifier conversion between Ensembl IDs, Gene Symbols, Entrez IDs, and Protein IDs (e.g., UniProt). It supports multiple species (human, mouse, zebrafish, etc.) and can use online databases such as Ensembl BioMart or local annotation tables for offline mapping.
 

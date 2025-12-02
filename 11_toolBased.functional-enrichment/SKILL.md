@@ -199,7 +199,7 @@ The tool will:
 2. (optional) extract the genes from the annotated regions file if neccessary for future analysis or the target gene list is requested by user. If not requested, skip this step.
 
 Call:
-`mcp__homer-tools__extract_gene_list_from_homer_annotated_file`
+`mcp__file-format-tools__extract_gene_list`
 
 With:
 - `sample`: the user-provided sample name

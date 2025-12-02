@@ -71,12 +71,3 @@ with:
 
 - (Option 2) For ChIP-seq data: 
 **Do Not Apply the standard Tn5 shift by setting `shift_tn5` as False**
-
-### Step 4: Generate ChIP-seq Fold-Change
-
-Call:
-- `mcp__bw_tools__run_bam_compare`
-with:
-- `bam_treatment`: ${ip_bam}
-- `bam_control`: ${input_bam}
-- `output_bw`: ${proj_dir}/tracks/${sample}_vs_Input.log2.bw

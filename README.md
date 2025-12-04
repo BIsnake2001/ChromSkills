@@ -58,16 +58,31 @@ docker run -it   -p 8080:8080   -v <path_local_homer_data>:/mnt/softwares/homer/
 
 Inside the container:
 
+- First run `claude`, log into your account and configure your claude code.
+
+- Then build required MCPs by running:
+
+```bash
+cd ~/ChromOmics
+./build_mcps.sh
+```
+
+---
+
+## 6. Initiate a project
+
+Inside the container:
+
 ```bash
 cd ~/ChromOmics/project_dir
 claude /mcp
 ```
 
-When the MCP initialization finishes, exit Claude.
+When the project initialization finishes, exit Claude.
 
 ---
 
-## 6. Start a Chat Session
+## 7. Start a Chat Session
 
 Inside the container:
 
@@ -81,5 +96,5 @@ Now you can use ChromSkills to run biological analyses directly through the chat
 
 ## You're Ready!
 
-You now have a working ChromSkills environment capable of performing HOMER‑powered biological analyses with Claude MCP skills.
+You now have a working ChromSkills environment capable of performing biological analyses with Claude skills.
 

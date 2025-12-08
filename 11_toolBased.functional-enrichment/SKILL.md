@@ -1,6 +1,6 @@
 ---
 name: functional-enrichment
-description: Perform GO and KEGG functional enrichment using HOMER from genomic regions (BED/narrowPeak/broadPeak) or gene lists, and produce R-based barplot/dotplot visualizations.
+description: Perform GO and KEGG functional enrichment using HOMER from genomic regions (BED/narrowPeak/broadPeak) or gene lists, and produce R-based barplot/dotplot visualizations. Use this skill when you want to perform GO and KEGG functional enrichment using HOMER from genomic regions or just want to link genomic region to genes.
 
 ---
 

@@ -194,7 +194,6 @@ with:
 The tool will:
 - Check if the chromosome names in the .mcool file.
 - If not, harmonize the chromosome names in the .mcool file.
-- If the chromosome names are modified, return the path of the modified .mcool file under `${proj_dir}/` directory
 
 ---
 

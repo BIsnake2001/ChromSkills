@@ -77,3 +77,7 @@ Now you can use ChromSkills to run biological analyses directly through the chat
 
 You now have a working ChromSkills environment capable of performing biological analyses with Claude skills.
 
+## Contact us
+
+If you have any questions or suggestions, feel free to reach out to us at 2211289@tongji.edu.cn
+

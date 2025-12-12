@@ -129,6 +129,7 @@ with:
 with:
 - `metilene_results_path`: DMR results from Step 3
 - `output_pdf_path`
+- `q_threshold`, `delta_threshold` as agreed.
 - Optional tuning of `point_size`, `alpha` as needed.
 
 **DMR length histogram**

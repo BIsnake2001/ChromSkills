@@ -1,13 +1,13 @@
 ---
-name: differential-accessibility
-description: The differential-accessibility pipeline is designed to identify genomic regions exhibiting significant differences in chromatin accessibility between experimental conditions (e.g., treatment vs. control). It integrates DESeq2 for robust statistical testing and supports workflows starting from either BAM files (aligned ATAC-seq/DNase-seq reads) or a precomputed count matrix. Use it when you aim to identify changes in chromatin accessibility across biological conditions, treatments, or cell types. It is particularly suited for ATAC-seq, DNase-seq, or other open-chromatin profiling datasets.
+name: differential-region-analysis
+description: The differential-region-analysis pipeline identifies genomic regions exhibiting significant differences in signal intensity between experimental conditions using a count-based framework and DESeq2. It supports detection of both differentially accessible regions (DARs) from open-chromatin assays (e.g., ATAC-seq, DNase-seq) and differential transcription factor (TF) binding regions from TF-centric assays (e.g., ChIP-seq, CUT&RUN, CUT&Tag). The pipeline can start from aligned BAM files or a precomputed count matrix and is suitable whenever genomic signal can be summarized as read counts per region.
 ---
 
-# ATAC-seq Differential Accessibility Analysis with DESeq2
+# Differential Region Analysis with DESeq2
 
 ## Overview
 
-This skill performs differential accessibility analysis between conditions.  
+This skill performs differential region analysis between experimental conditions using DESeq2 in a count-based framework. 
 Main steps include:
 
 - Initialize the project directory.
@@ -24,7 +24,7 @@ Main steps include:
 ---
 
 ## When to use this skill
-Use the differential-accessibility pipeline when you aim to identify changes in chromatin accessibility across biological conditions, treatments, or cell types. It is particularly suited for ATAC-seq, DNase-seq, or other open-chromatin profiling datasets.
+Use the differential-region-analysis pipeline when your goal is to identify genomic regions with condition-dependent changes in signal intensity, provided the signal can be represented as raw read counts per region.
 
 Recommended scenarios include:
 
@@ -48,7 +48,7 @@ The pipeline performs best with datasets containing biological replicates (≥2 
 ### Outputs
 
 ```bash
-${sample}_DAR_analysis/
+${sample}_DAR_analysis/ # or ${tf}_${sample}_DB_analysis in differential TF binding detection task
     tables/
       all_peaks.bed
       consensus_peaks.bed # Unified peak set
@@ -84,8 +84,8 @@ with:
 
 The tool will:
 
-- Create `${sample}_DAR_analysis` directory.
-- Return the full path of the `${sample}_DAR_analysis` directory, which will be used as `${proj_dir}`.
+- Create `${sample}_DAR_analysis` (or `${tf}_${sample}_DB_analysis`) directory.
+- Return the full path of the `${sample}_DAR_analysis` (or `${tf}_${sample}_DB_analysis`) directory, which will be used as `${proj_dir}`.
 
 
 ### Step 1: Generate Consensus Peaks
@@ -149,7 +149,7 @@ with:
 - contrast_treatment: Treatment group name (e.g. 'Treated').
 - output_csv: Output path for results CSV.
 
-Output: `DAR_results.csv`
+Output: `DAR_results.csv` or `${tf}_DB_results.csv`
 
 ---
 
@@ -182,7 +182,7 @@ with:
 - `log2fc_cutoff`: Provided by user
 
 
-Output: `DAR_sig.bed` `DAR_up.bed` `DAR_down.bed`
+Output: `DAR_sig.bed` `DAR_up.bed` `DAR_down.bed` or `${tf}_DB_sig.bed` `${tf}_DB_up.bed` `${tf}_DB_down.bed`
 
 ## Advanced Usage
 

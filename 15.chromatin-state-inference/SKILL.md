@@ -16,7 +16,6 @@ Main steps include:
 - **Always prompt user** for genome assembly used.
 - **Always prompt user** for the bin size for generating binarized files.
 - **Always prompt user** for the bin size for the number of states the ChromHMM target.
-- **Always prompt user** for the absolute path of ChromHMM JAR file.
 - **Run chromHMM workflow**: Binarization → Learning.
 
 ---
@@ -61,12 +60,31 @@ chromhmm_output/
 
 ## Decision Tree
 
-### Step 1: Prepare the `cellmarkfile`
+### Step 0: Initialize Project
+
+Call:
+
+- `mcp__project-init-tools__project_init`
+
+with:
+
+- `sample`: all
+- `task`: chromhmm
+
+### Step 1: Prepare the `cellmarkfile` (skip this step if signal files are provided)
 
 - Prepare a .txt file (without header) containing following three columns:
   - sample name
   - marker name
   - name of the BED/BAM file
+  - control file of the sample (only provided if the input/control file is available)
+
+- example of the cellmark.txt file
+
+```bash
+cell1    mark1    cell1_mark2.bam    cell1_control.bam
+cell1   mark2    cell1_mark2.bam    cell1/control.bam
+```
 
 ### Step 2: Data Binarization
 
@@ -74,8 +92,7 @@ chromhmm_output/
      Call:
      - `mcp__chromhmm-tools__binarize_bam` 
      with:
-     - `ChromHMM_path`: Path to ChromHMM JAR file, provided by user
-     - `genome`: Provide by user (e.g. `hg38`)
+     - `path_chrom_sized`: Provide by user or detect from the working directory
      - `input_dir`: Directory containing BAM files
      - `cellmarkfile`: Cell mark file defining histone modifications
      - `output_dir`: (e.g. `binarized/`)
@@ -84,19 +101,24 @@ chromhmm_output/
 - For BED inputs:  
   Call `mcp__chromhmm-tools__binarize_bed` instead.
 
+- For Signal inputs:  
+  Call: `mcp__chromhmm-tools__binarize_signal`
+  with:
+  - `input_dir`: Directory of signals
+  - `output_dir`: (e.g. `binarized/`)
+
+
 ### Step 3: Model Learning
 
 Call 
 - `mcp__chromhmm-tools__learn_model`
 
 with:
-- `ChromHMM_path`: Path to ChromHMM JAR file, provided by user
 - `binarized_dir`: Directory binarized file located in
 - `num_states`: Provide by user (e.g. 15)
 - `output_model_dir`: (e.g. `model_15_states/`)
 - `genome`: Provide by user (e.g. `hg38`)
-- `num_states`: Provide by user (e.g. `hg38`)
-- `threads`: (e.g. 4)
+- `threads`: Provide by user (e.g. 16)
 
 ## Parameter Optimization
 

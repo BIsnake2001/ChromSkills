@@ -1,17 +1,19 @@
 ---
 name: genomic-feature-annotation
-description: This skill is used to perform genomic feature annotation and visualization for any file containing genomic region information using Homer (Hypergeometric Optimization of Motif EnRichment). It annotates regions such as promoters, exons, introns, intergenic regions, and TSS proximity, and generates visual summaries of feature distributions.
+description: This skill is used to perform genomic feature annotation and visualization for any file containing genomic region information using Homer (Hypergeometric Optimization of Motif EnRichment). It annotates regions such as promoters, exons, introns, intergenic regions, and TSS proximity, and generates visual summaries of feature distributions. ChIPseeker mode is also supported according to requirements.
 ---
 
 # Genomic Feature Annotation and Visualization with Homer
 
 ## Overview
 
-1. Prepare genomic region files in BED or other supported formats. Ensure that the input genomic regions are provided in a valid BED format (chromosome, start, end). If the file does not meet this format, extract the required columns to create a valid BED file.regions file.
-2. Identify and specify the correct genome assembly for annotation.  
-3. Annotate the genomic regions using Homer's `annotatePeaks.pl`.  
-4. Generate annotation statistics and feature distribution summaries.  
-5. Visualize annotation results (e.g., pie charts, barplots).  
+- Prepare genomic region files in BED or other supported formats. Ensure that the input genomic regions are provided in a valid BED format (chromosome, start, end). If the file does not meet this format, extract the required columns to create a valid BED file.regions file.
+- Identify and specify the correct genome assembly for annotation.
+- Always prompt user for the tool to use, choose from ChIPseeker or HOMER
+- If the user choose HOMER, then:
+    - Annotate the genomic regions using Homer's `annotatePeaks.pl`.  
+    - Generate annotation statistics and feature distribution summaries.  
+    - Visualize annotation results (e.g., pie charts, barplots).
 
 ---
 
@@ -35,7 +37,7 @@ Genomic region formats supported:
 
 ### Outputs
 ```bash
-${sample}_genomic_feature_annotation/
+genomic_feature_annotation/
     results/
         ${sample}.anno_genomic_features.txt
         ${sample}.anno_genomic_features_stats.txt
@@ -76,23 +78,8 @@ The tool will:
 ---
 
 
-### Step 2: Prepare genome file for homer
 
-Call:
-- `mcp__homer-tools__check_genome_installation`
-
-With:
-- `genome`: the user-provided genome assembly, e.g. `hg38`, `mm10`, `danRer11`
-
-The tool will:
-- Check if the genome is installed in HOMER.
-- If not, install the genome.
-
-
----
-
-
-### Step 3 (Optional): Standardize chromosome names for BED files
+### Step 2 (Optional): Standardize chromosome names for BED files
 
 This step is optional. Only perform this step if the input file is a BED file. If the input file is a gene list, skip this step.
 
@@ -114,8 +101,9 @@ The tool will:
 ---
 
 
-### Step 4: Genomic Feature Annotation
+### Step 3: Genomic Feature Annotation
 
+- (Option 1) HOMER mode
 Call:
 `mcp__homer-tools__annotate_genomic_features`
 
@@ -135,11 +123,32 @@ The tool will:
     - `${proj_dir}/results/${sample}.anno_genomic_features_stats.txt`
     - `${proj_dir}/logs/${sample}.anno_genomic_features.log`
 
+- (Option 2) ChIPseeker mode
+
+```r
+library(ChIPseeker)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene) # ajust this depend on species
+library(org.Mm.eg.db) # ajust this depend on species
+txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene # ajust this depend on species
+peak_file <- "$sample.narrowPeak" 
+peak_anno <- annotatePeak(
+  peak_file,
+  TxDb     = txdb,
+  tssRegion = c(-3000, 3000),     # define "promoter" window around TSS
+  annoDb   = "org.Mm.eg.db"       # adds SYMBOL, GENENAME, etc.
+)
+pdf("plots/${sample}_anno_ChIPseeker.pdf", width = 6, height = 5)
+plotAnnoPie(peak_anno)
+plotAnnoBar(peak_anno)
+plotDistToTSS(peak_anno)
+dev.off()
+```
+
 
 ---
 
 
-### Step 5: Visualize the annotation results
+### Step 4: Visualize the annotation results (executed only in HOMER mode)
 
 Call:
 - `mcp__plot-anno-tools__visualize_annotation_results`
@@ -155,7 +164,7 @@ The tool will:
 
 ---
 
-### Step 6. Interpretation of Results
+### Step 5. Interpretation of Results
 
 Typical annotation categories:
 - **Promoter**: -1 kb to +100 bp from TSS  

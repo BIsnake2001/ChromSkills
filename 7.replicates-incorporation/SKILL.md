@@ -11,7 +11,8 @@ This skill provides two modes for replicates incorporation:
 
 - Refer to the **Inputs & Outputs** section to check inputs and build the output architecture. All the output file should located in `${proj_dir}` in Step 0.
 - Always use filtered BAM file (`*.filtered.bam`) if available.
-- Pre-Peak Calling (BAM Mode): If provided with >3 biological replicates, it merges all BAMs, generate the merge BAM file to prepare for track generation and splits them into 2 balanced "pseudo-replicates" to prepare for peak calling.
+- Always prompt user for whether generate psedo-replicates if more then 2 replicates.
+- Pre-Peak Calling (BAM Mode): If provided with >2 biological replicates, it merges all BAMs, generate the merge BAM file to prepare for track generation and splits them into 2 balanced "pseudo-replicates" to prepare for peak calling only if user required.
 - Post-Peak Calling (Peak Mode): If provided with peak files (only support two replicates, derived from either 2 true replicates or 2 pseudo-replicates), it performs IDR (Irreproducible Discovery Rate) analysis, filters non-reproducible peaks, and generates a final "conservative" or "optimal" consensus peak set
 
 ---
@@ -42,7 +43,7 @@ with:
 - `bam_files`: `[${rep1_bam}, ${rep2_bam}, ${rep3_bam}]` (Add as many as needed)
 - `output_bam`: `${proj_dir}/temp/${sample}.pooled.bam`
 
-Call: (call this only when more than two replicates are provided)
+Call: (call this only when more than two replicates are provided and user prompt for generating pseudo replicates)
 - `mcp__bw_tools__split_pseudo_replicates`
 with:
 bam_file: `${proj_dir}/temp/${sample}.pooled.bam`

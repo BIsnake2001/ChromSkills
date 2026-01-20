@@ -1,6 +1,6 @@
 ---
 name: track-generation
-description: This skill generates normalized BigWig (.bw) tracks (and/or fold-change tracks) from BAM files for ATAC-seq and ChIP-seq visualization. It handles normalization (RPM or fold-change) and Tn5 offset correction automatically. Use this skill when you have filtered and generated the clean BAM file (e.g. `*.filtered.bam`).
+description: This skill generates normalized BigWig (.bw) tracks (and/or fold-change tracks) from BAM files for ATAC-seq and ChIP-seq visualization. It handles normalization (RPM or fold-change) and Tn5 offset correction automatically. What's more, this skill can help user visualize the signal profiles around TSS or target regions. Use this skill when you have filtered and generated the clean BAM file (e.g. `*.filtered.bam`).
 ---
 
 ## Overview
@@ -15,6 +15,8 @@ Main steps include:
 - Generate the chrom.size file.  
 - **For ATAC-seq**, apply Tn5 offset correction (+4/−5) and generate normalized BigWig (RPM).  
 - **For ChIP-seq**, generat RPM-normalized track without applying Tn5 offset correction
+- Always prompt user for whether need to visualize the signal profiles around TSS or target regions.
+- Visualize the signal profiles around TSS or target regions if users require.
 
 ---
 
@@ -71,3 +73,14 @@ with:
 
 - (Option 2) For ChIP-seq data: 
 **Do Not Apply the standard Tn5 shift by setting `shift_tn5` as False**
+
+### Step 3: Visualize the signal profiles around TSS or target region (Optional)
+Call:
+- `mcp__bw_tools__visualize_signal_profile`
+with:
+`regions_bed`: GTF (for gene tss) or BED file (for target regions), always query user for this file if not provided.
+`signal_files`: Input BigWig signal files.
+`output_prefix`: Output prefix for matrix/plots.
+`reference_point`: use `TSS` for genes, and `center` for target regions.
+`upstream`: Upstream distance (bp).
+`downstream`: Downstream distance (bp).

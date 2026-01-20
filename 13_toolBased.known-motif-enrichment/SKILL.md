@@ -167,7 +167,7 @@ With:
 - `threads`: number of processors to use (default: 4)
 - `num_motifs`: number of motifs to find (default: 25)
 - `lengths`: motif lengths to search (default: 8,10,12)
-- `nomotif`: `True` to not use de novo motif finding
+- `nomotif`: must set as `True`.
 - `mknown`: motif file to use for enrichment analysis. May be the motif file returned by `mcp__homer-tools__locate_motif_file`.
 - `mcheck`: motif file to check the enrichment of. May be the motif file returned by `mcp__homer-tools__locate_motif_file`.
 

@@ -64,12 +64,6 @@ ${sample}_functional_enrichment/
       go_mf.tsv
       go_cc.tsv
       kegg.tsv
-    plots/
-      ${sample}.GO_barplot.pdf
-      GO_barplot.pdf
-      GO_dotplot.pdf
-      KEGG_barplot.pdf
-      KEGG_dotplot.pdf
     logs/
       ${sample}.anno_genomic_features.log # if genome region file is provided
       findGO.log
@@ -238,22 +232,6 @@ The tool will:
 
 
 ---
-
-
-### Step 6: Visualization in Python (barplot & dotplot)
-
-Call:
-`mcp__homer-tools__visualize_gene_function_enrichment`
-
-With:
-- `sample`: the user-provided sample name
-- `proj_dir`: directory to save the GO & KEGG enrichment results. In this skill, it is the full path of the `${sample}_functional_enrichment` directory returned by `mcp__project-init-tools__project_init`
-- `go_results_file`: the user-provided GO results file. May be `${proj_dir}/results/biological_process.txt` or `${proj_dir}/results/molecular_function.txt` or `${proj_dir}/results/cellular_component.txt`, etc. This could be the GO results file under the `${proj_dir}/results/` directory returned by `mcp__homer-tools__gene_function_enrichment`.
-
-The tool will:
-- Visualize the GO & KEGG enrichment results in barplot and dotplot.
-- Return the path of the barplot file under `${proj_dir}/plots/` directory.
-    - `${proj_dir}/plots/${sample}.GO_barplot.pdf`
 
 
 

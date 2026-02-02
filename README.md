@@ -223,7 +223,6 @@ claude mcp add MyTool -s user -- python /root/MCPs/MyTool.py
 ```bash
 claude /mcp
 ```
-Your Skill is now discoverable and reusable.
 ---
 
 ## Design principles

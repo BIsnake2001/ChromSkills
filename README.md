@@ -194,10 +194,10 @@ Directory structure:
 
 Execution flow:
 
-1.Claude reads Skill metadata
-2.Matches Skills to user intent
-3.Loads full Skill logic on demand
-4.Executes tools with context-aware parameters
+1.Claude reads Skill metadata<br>
+2.Matches Skills to user intent<br>
+3.Loads full Skill logic on demand<br>
+4.Executes tools with context-aware parameters<br>
 
 ---
 

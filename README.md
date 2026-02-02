@@ -156,7 +156,8 @@ wt_H3K4me3_rep1.bam
 Identify H3K4me3 and H3K27me3 peaks, annotate their genomic features, evaluate the data quality, and generate genome-wide signal tracks for visualization in IGV with available skills.
 ```
 ### Output
-[Task1](example/reports/Task1.md)
+
+[example output reports from ChromSkills](example/reports/Task1.md)
 ---
 
 ## Skill architecture

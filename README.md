@@ -180,10 +180,10 @@ Identify H3K4me3 and H3K27me3 peaks, annotate their genomic features, evaluate t
 
 Each Skill is:
 
--Markdown-based
--Human-readable
--Decision-tree driven
--Tool-constrained via MCP
+- Markdown-based
+- Human-readable
+- Decision-tree driven
+- Tool-constrained via MCP
 
 Directory structure:
 

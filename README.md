@@ -7,9 +7,9 @@ ChromSkills translates **natural-language analysis intents** into structured, to
 ---
 ![image](https://github.com/BIsnake2001/ChromSkills/blob/master/img/ChromSkills_framework.png)
 
-## Scope
+## 1. Scope
 
-### What ChromSkills is for
+### (1) What ChromSkills is for
 
 ChromSkills focuses on **lightweight, workstation-friendly downstream analysis** that is practical on a desktop or laptop and supports reproducible reporting.
 
@@ -22,7 +22,7 @@ Typical use cases include:
 - WGBS methylation profiling and DMR analysis
 - Integrative multi-omics analysis (e.g. ATAC + WGBS + RNA)
 
-### 🚫 What ChromSkills does *NOT* do
+### (2) 🚫 What ChromSkills does *NOT* do
 
 To avoid incorrect expectations:
 
@@ -33,23 +33,22 @@ ChromSkills **starts from processed inputs**, such as BAM, cool/mcool, or methyl
 
 ---
 
-## 📊 Can I use ChromSkills with my data?
+### (3) 📊 Can I use ChromSkills with my data?
 
 Use the table below to quickly determine whether your data can be analyzed **directly** with ChromSkills.
 
 | Assay | Required starting input | Supported analyses |
 |------|------------------------|--------------------|
-| **ATAC-seq** | BAM | QC, filtering, peak calling, replicate handling, footprinting, differential accessibility, motif analysis, track generation |
-| **ChIP-seq** | BAM | QC, peak calling, genomic annotation, motif discovery/enrichment, differential binding |
+| **ATAC-seq/ChIP-seq** | BAM | QC, peak calling, replicate handling, track generation, footprinting, differential accessibility/binding, motif analysis, peak annotation, chromatin state inference |
 | **WGBS** | Per-CpG methylation table (BED / BedGraph / TSV) | Global/local methylation, DMR/DMC, methylation variability, UMR/LMR/PMD detection |
-| **Hi-C** | `.cool` / `.mcool` | Matrix QC, normalization, compartments, compartment shifts, TADs (including nested), loops, differential TADs |
+| **Hi-C** | `.cool` / `.mcool` | Matrix QC, normalization, compartments, compartment shifts, TADs (including nested), loops, differential TADs, loop annotations, regulatory community analysis |
 | **Multi-omics** | Any combination above | ATAC–WGBS correlation, DMR–DEG integration, regulatory feature association |
 
 ---
 
-## Installation
+## 2. Quick Start
 
-### 1. Pull Docker image
+### (1) Pull Docker image
 
 ```bash
 docker pull yuxuan2001/chromskills
@@ -57,7 +56,7 @@ docker pull yuxuan2001/chromskills
 
 ---
 
-## 2. Run the Docker container
+## (2) Run the Docker container
 
 Run ChromSkills in interactive mode:
 
@@ -82,7 +81,7 @@ Inside the container, work under:
 
 ---
 
-## 3. Configure HOMER (required for motif & annotation tasks)
+### (3) Configure HOMER (required for motif & annotation tasks)
 
 ```bash
 cd /mnt/softwares/homer
@@ -94,7 +93,7 @@ Install other species as needed.
 
 ---
 
-## 4. Configure Claude Code and build MCP tools
+### (4) Configure Claude Code and build MCP tools
 
 Inside the container:
 
@@ -107,24 +106,24 @@ This builds the structured MCP tool interfaces required by ChromSkills.
 
 ---
 
-## 5. Choose your LLM backend
+### (5) Choose your LLM backend (COST SENSITIVE!!!)
 
-ChromSkills works with **any Claude Code–compatible model backend**.
+ChromSkills works with **any Claude Code-compatible model backend**.
 
-### Option A — Claude (default)
+### Option A — Claude (~$3–$15/1M token)
 
 ```bash
 export ANTHROPIC_API_KEY=your_key_here
 ```
 
-### Option B — DeepSeek
+### Option B — DeepSeek (~$0.28–$0.42/1M token)
 
 ```bash
 export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
 export ANTHROPIC_AUTH_TOKEN=your_key_here
 ```
 
-### Option C — MiniMax
+### Option C — MiniMax (~$0.2–$2.2/1M token)
 
 ```bash
 export ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic
@@ -133,7 +132,7 @@ export ANTHROPIC_AUTH_TOKEN=your_key_here
 
 ---
 
-## 6. Initialize a project
+### (6) Initialize a project
 
 ```bash
 cd ${path_to_project_dir}
@@ -144,7 +143,7 @@ Wait until initialization completes, then exit.
 
 ---
 
-## 7. Start a chat session
+### (7) Start a chat session
 
 ```bash
 chat
@@ -154,29 +153,29 @@ You can now perform analyses through natural language.
 
 ---
 
-## Example usage
+## 3. A Quick Example
 
-### Input data
+### (1) Download demo input data
 ```bash
-fixed_blacklist.bed
-wt_input_rep1.bam
-wt_input_rep2.bam   
-wt_H3K27me3_rep2.bam  
-wt_H3K4me3_rep2.bam
-wt_H3K27me3_rep1.bam  
-wt_H3K4me3_rep1.bam   
+wget https://zenodo.org/record/1324070/files/wt_H3K4me3_rep1.bam
+wget https://zenodo.org/record/1324070/files/wt_H3K4me3_rep2.bam
+wget https://zenodo.org/record/1324070/files/wt_H3K27me3_rep1.bam
+wget https://zenodo.org/record/1324070/files/wt_H3K27me3_rep2.bam
+wget https://zenodo.org/record/1324070/files/wt_input_rep1.bam 
+wget https://zenodo.org/record/1324070/files/wt_input_rep2.bam   
 ```
 
-### Prompt
+### (2) Prompt
 ```
 Identify H3K4me3 and H3K27me3 peaks, annotate their genomic features, evaluate the data quality, and generate genome-wide signal tracks for visualization in IGV with available skills.
 ```
-### Output
+### (3) Output
 
 [example output reports from ChromSkills](example/reports/Task1.md)
 ---
 
-## Skill architecture
+## 4. Advanced Usage
+### (1) Skill architecture
 
 Each Skill is:
 
@@ -201,31 +200,31 @@ Execution flow:
 
 ---
 
-## Writing your own Skills
+### (2) Writing your own Skills
 
-1. Create a new Skill.md file:
+a. Create a new Skill.md file:
 
 ```bash
 ~/.claude/skills/MySkill/SKILL.md
 ```
 
-2. Write instructions + decision logic in Markdown
-3. Implement required MCP tools:
+b. Write instructions + decision logic in Markdown
+c. Implement required MCP tools:
 
 ```bash
 ~/MCPs/MyTool.py
 ```
-4. Register the MCP tool:
+d. Register the MCP tool:
 ```bash
 claude mcp add MyTool -s user -- python /root/MCPs/MyTool.py
 ```
-5. Restart Claude Code by executing:
+e. Restart Claude Code by executing:
 ```bash
 claude /mcp
 ```
 ---
 
-## Design principles
+### (3) Design principles
 
 ChromSkills:
 
@@ -235,7 +234,7 @@ ChromSkills:
 - reduces hallucinated commands
 - enables laptop-friendly epigenomic analysis
 
-## Contributing
+### (4) Contributing
 
 We welcome:
 

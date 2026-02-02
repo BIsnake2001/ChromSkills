@@ -5,7 +5,7 @@ ChromSkills is a curated library of domain-specific Claude Code Skills for **age
 ChromSkills translates **natural-language analysis intents** into structured, tool-guided workflows across common epigenomic assays, while enforcing assay-aware decision logic and reducing unstable, free-form command generation.
 
 ---
-![image](https://github.com/BIsnake2001/ChromSkills/blob/master/img/ChromSKills_framework.png)
+![image](https://github.com/BIsnake2001/ChromSkills/blob/master/img/ChromSkills_framework.png)
 
 ## Scope
 

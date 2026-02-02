@@ -13,21 +13,37 @@ ChromSkills translates **natural-language analysis intents** into structured, to
 
 ChromSkills focuses on **lightweight, workstation-friendly downstream analysis** that is practical on a desktop or laptop and supports reproducible reporting.
 
-### What ChromSkills does NOT do
+Typical use cases include:
 
-ChromSkills **does not include raw read mapping** (e.g., FASTQ → BAM) and is **not intended as a full HPC pipeline replacement**.
+- ATAC-seq / ChIP-seq peak calling and QC
+- Differential accessibility / binding analysis
+- Motif discovery and enrichment
+- Hi-C compartment, TAD, and loop analysis
+- WGBS methylation profiling and DMR analysis
+- Integrative multi-omics analysis (e.g. ATAC + WGBS + RNA)
 
-Users should provide **aligned or processed inputs** (see below).
+### 🚫 What ChromSkills does *NOT* do
+
+To avoid incorrect expectations:
+
+- ❌ **No read mapping** (FASTQ → BAM)
+- ❌ **No heavy HPC pipelines**
+
+ChromSkills **starts from processed inputs**, such as BAM, cool/mcool, or methylation tables.
 
 ---
 
-## Supported assays and starting inputs
+## 📊 Can I use ChromSkills with my data?
 
-| Assay / data type | Start from | Examples of supported analysis |
-|------------------|-----------|--------------------------------|
-| ChIP-seq / ATAC-seq | BAM | alignment-level QC, filtering, peak calling, track generation, replicate handling, differential binding/accessibility, motif discovery/enrichment, peak annotation |
-| WGBS | per-CpG methylation calls (BED/BedGraph/TSV) | DMR/DMC, global/local methylation profiling, variability/heterogeneity, UMR/LMR/PMD detection, integration with chromatin features, DMR–DEG integration |
-| Hi-C | .cool / .mcool | normalization, matrix QC, A/B compartments and shifts, TADs (including nested TADs), loops, loop annotation, differential TAD analysis, regulatory community analysis |
+Use the table below to quickly determine whether your data can be analyzed **directly** with ChromSkills.
+
+| Assay | Required starting input | Supported analyses |
+|------|------------------------|--------------------|
+| **ATAC-seq** | BAM | QC, filtering, peak calling, replicate handling, footprinting, differential accessibility, motif analysis, track generation |
+| **ChIP-seq** | BAM | QC, peak calling, genomic annotation, motif discovery/enrichment, differential binding |
+| **WGBS** | Per-CpG methylation table (BED / BedGraph / TSV) | Global/local methylation, DMR/DMC, methylation variability, UMR/LMR/PMD detection |
+| **Hi-C** | `.cool` / `.mcool` | Matrix QC, normalization, compartments, compartment shifts, TADs (including nested), loops, differential TADs |
+| **Multi-omics** | Any combination above | ATAC–WGBS correlation, DMR–DEG integration, regulatory feature association |
 
 ---
 
@@ -162,49 +178,55 @@ Identify H3K4me3 and H3K27me3 peaks, annotate their genomic features, evaluate t
 
 ## Skill architecture
 
-Each Skill is stored as `SkillName/SKILL.md` in `~/.claude/skills` directory
-Each MCP tools is stored as `MCPName.py` in `~/MCPs` directory
+Each Skill is:
 
-Skills are:
+-Markdown-based
+-Human-readable
+-Decision-tree driven
+-Tool-constrained via MCP
 
-- Markdown-based
-- Human-readable
-- Domain-aware
-- Deterministic (tool-constrained)
+Directory structure:
 
-When needed:
+```
+~/.claude/skills/SkillName/SKILL.md
+~/MCPs/ToolName.py
+```
 
-1. Claude reads Skill metadata
-2. Selects relevant Skills
-3. Loads full Skill content
-4. Executes tools with context-aware parameters
+Execution flow:
+
+1.Claude reads Skill metadata
+2.Matches Skills to user intent
+3.Loads full Skill logic on demand
+4.Executes tools with context-aware parameters
 
 ---
 
-## Adding new Skills
+## Writing your own Skills (advanced users)
 
-1. Create a new folder in `~/.claude/skills` directory:
+1. Create a new Skill.md file:
 
-```
-MySkill/SKILL.md
+```bash
+~/.claude/skills/MySkill/SKILL.md
 ```
 
 2. Write instructions + decision logic in Markdown
-3. Create requiered `MCPName.py` in `~/MCPs` directory
-4. Add MCPs into Claude Code by executing:
-```bash
-claude mcp add <MCPName> -s user -- python /root/MCPs/MCPName.py
-```
-5. Make sure the <MCPName> invoked in the Skills is the same as those in the command line above
-6. Restart Claude Code by executing:
+3. Implement required MCP tools:
 
+```bash
+~/MCPs/MyTool.py
+```
+4. Register the MCP tool:
+```bash
+claude mcp add MyTool -s user -- python /root/MCPs/MyTool.py
+```
+5. Restart Claude Code by executing:
 ```bash
 claude /mcp
 ```
-
+Your Skill is now discoverable and reusable.
 ---
 
-## Design philosophy
+## Design principles
 
 ChromSkills:
 
@@ -214,3 +236,13 @@ ChromSkills:
 - reduces hallucinated commands
 - enables laptop-friendly epigenomic analysis
 
+## Contributing
+
+We welcome:
+
+- new Skills
+- improved decision trees
+- additional assay support
+- documentation improvements
+
+Feel free to open issues or pull requests.

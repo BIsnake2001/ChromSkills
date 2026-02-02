@@ -201,7 +201,7 @@ Execution flow:
 
 ---
 
-## Writing your own Skills (advanced users)
+## Writing your own Skills
 
 1. Create a new Skill.md file:
 
@@ -246,3 +246,7 @@ We welcome:
 - documentation improvements
 
 Feel free to open issues or pull requests.
+
+## Contact us
+
+If you have any questions or suggestions, feel free to reach out to us at 2211289@tongji.edu.cn

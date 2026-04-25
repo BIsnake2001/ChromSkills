@@ -97,19 +97,12 @@ ChromSkills is not limited to Claude Code. If your coding agent supports compati
 ### (5) Configure Your Coding Agent (COST SENSITIVE!!!)
 - **Option A: Use Claude Code with an API Backend**
 ChromSkills works with any target coding agent-compatible model backend.
-| Coding Agent | Price (per 1M tokens) | Environment Variable Example(s) |
-|--------------|-----|--------------------------------|
-| **Claude** | ~$3–$15 | `export ANTHROPIC_API_KEY=your_key_here` |
-| **DeepSeek** | ~$0.28–$0.42 | `export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic`<br>`export ANTHROPIC_AUTH_TOKEN=your_key_here` |
-| **MiniMax**  | ~$0.20–$2.20 | `export ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`<br>`export ANTHROPIC_AUTH_TOKEN=your_key_here` |
 
 | Coding Agent | Price (per 1M tokens) | Environment Variable Example(s) |
 |------|------------------------|--------------------|
 | **Claude** | ~$3–$15 | `export ANTHROPIC_API_KEY=your_key_here` |
 | **DeepSeek** | ~$0.28–$0.42 | `export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic`<br>`export ANTHROPIC_AUTH_TOKEN=your_key_here` |
-| **MiniMax** | ~$0.20–$2.20 | Matrix QC, normalization, compartments, compartment shifts, TADs (including nested), loops, differential TADs, loop annotations, regulatory community analysis |
-| **Multi-omics** | Any combination above | ATAC–WGBS correlation, DMR–DEG integration, regulatory feature association |
-
+| **MiniMax** | ~$0.20–$2.20 | `export ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`<br>`export ANTHROPIC_AUTH_TOKEN=your_key_here` |
 - **Option B: Use a Local Gemma 4 Model with Ollama**
 
 If you want to avoid paying for a backend model API, you can deploy a local Gemma 4 model with Ollama and connect Claude Code to the local Ollama server.

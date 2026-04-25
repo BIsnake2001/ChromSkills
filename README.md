@@ -11,36 +11,24 @@ ChromSkills translates **natural-language analysis intents** into structured, to
 
 ### (1) What ChromSkills is for
 
-ChromSkills focuses on **lightweight, workstation-friendly downstream analysis** that is practical on a desktop or laptop and supports reproducible reporting.
+Typical use cases of ChromSkills include:
 
-Typical use cases include:
+- ChIP-seq analysis
+- ATAC-seq analysis
+- WGBS and DNA methylation analysis
+- Hi-C analysis
+- Multi-omics integration
+- Read mapping/alignment workflows
+- Quality control, annotation, visualization, and downstream biological interpretation
 
-- ATAC-seq / ChIP-seq peak calling and QC
-- Differential accessibility / binding analysis
-- Motif discovery and enrichment
-- Hi-C compartment, TAD, and loop analysis
-- WGBS methylation profiling and DMR analysis
-- Integrative multi-omics analysis (e.g. ATAC + WGBS + RNA)
-
-### (2) 🚫 What ChromSkills does *NOT* do
-
-To avoid incorrect expectations:
-
-- ❌ **No read mapping** (FASTQ → BAM)
-- ❌ **No heavy HPC pipelines**
-
-ChromSkills **starts from processed inputs**, such as BAM, cool/mcool, or methylation tables.
-
----
-
-### (3) 📊 Can I use ChromSkills with my data?
+### (2) 📊 Can I use ChromSkills with my data?
 
 Use the table below to quickly determine whether your data can be analyzed **directly** with ChromSkills.
 
 | Assay | Required starting input | Supported analyses |
 |------|------------------------|--------------------|
-| **ATAC-seq/ChIP-seq** | BAM | QC, peak calling, replicate handling, track generation, footprinting, differential accessibility/binding, motif analysis, peak annotation, chromatin state inference |
-| **WGBS** | Per-CpG methylation table (BED / BedGraph / TSV) | Global/local methylation, DMR/DMC, methylation variability, UMR/LMR/PMD detection |
+| **ATAC-seq/ChIP-seq** | BAM | reads mapping, QC, peak calling, replicate handling, track generation, footprinting, differential accessibility/binding, motif analysis, peak annotation, chromatin state inference |
+| **WGBS** | Per-CpG methylation table (BED / BedGraph / TSV) | reads mapping, Global/local methylation, DMR/DMC, methylation variability, UMR/LMR/PMD detection |
 | **Hi-C** | `.cool` / `.mcool` | Matrix QC, normalization, compartments, compartment shifts, TADs (including nested), loops, differential TADs, loop annotations, regulatory community analysis |
 | **Multi-omics** | Any combination above | ATAC–WGBS correlation, DMR–DEG integration, regulatory feature association |
 
@@ -93,50 +81,64 @@ Install other species as needed.
 
 ---
 
-### (4) Configure Claude Code and build MCP tools
+### (4) Install ChromSkills MCP Tools and Skills
 
-Inside the container:
-
-```bash
-cd ~
-./build_mcps.sh
-```
-
-This builds the structured MCP tool interfaces required by ChromSkills.
-
----
-
-### (5) Choose your LLM backend (COST SENSITIVE!!!)
-
-ChromSkills works with **any Claude Code-compatible model backend**.
-
-### Option A — Claude (~$3–$15/1M token)
+Inside the container, ChromSkills provides installation scripts in `~/scripts`. These scripts install or update the MCP tools and Skill files required by ChromSkills.
 
 ```bash
-export ANTHROPIC_API_KEY=your_key_here
+cd ~/scripts
+# Install MCP tools and Skills according to coding agent you prefer
+./install-claude.sh # the default coding agent is Claude Code
 ```
+‼️ Notes for Users of Other Coding Agents
 
-### Option B — DeepSeek (~$0.28–$0.42/1M token)
+ChromSkills is not limited to Claude Code. If your coding agent supports compatible Skill loading and MCP tool invocation, you can install the ChromSkills Skills and MCP tools by executing `~/scripts/install_{name_coding_agent}.sh` and adapt the agent configuration accordingly.
+
+### (5) Configure Your Coding Agent (COST SENSITIVE!!!)
+- **Option A: Use Claude Code with an API Backend**
+ChromSkills works with any target coding agent-compatible model backend.
+| Coding Agent | Price (per 1M tokens)     | Environment Variable Example(s)                                                                                  |
+|--------------|--------------------------|------------------------------------------------------------------------------------------------------------------|
+| **Claude**   | ~$3–$15                  | `export ANTHROPIC_API_KEY=your_key_here`                                                                         |
+| **DeepSeek** | ~$0.28–$0.42             | `export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic`<br>`export ANTHROPIC_AUTH_TOKEN=your_key_here`    |
+| **MiniMax**  | ~$0.20–$2.20             | `export ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic`<br>`export ANTHROPIC_AUTH_TOKEN=your_key_here`      |
+
+- **Option B: Use a Local Gemma 4 Model with Ollama**
+
+If you want to avoid paying for a backend model API, you can deploy a local Gemma 4 model with Ollama and connect Claude Code to the local Ollama server.
+
+First, install Ollama:
 
 ```bash
-export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
-export ANTHROPIC_AUTH_TOKEN=your_key_here
+curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### Option C — MiniMax (~$0.2–$2.2/1M token)
+Then pull a Gemma 4 model. The model size can be selected according to your hardware resources, for example `e2b`, `e4b`, `26b`, or `31b`.
 
 ```bash
-export ANTHROPIC_BASE_URL=https://api.minimax.io/anthropic
-export ANTHROPIC_AUTH_TOKEN=your_key_here
+ollama pull gemma4:31b
 ```
 
+Open a new terminal and start the Ollama server:
+
+```bash
+ollama serve
+```
+
+Leave this terminal running. In another terminal, connect Claude Code to your local Ollama server:
+
+```bash
+export ANTHROPIC_BASE_URL=http://localhost:11434
+export ANTHROPIC_AUTH_TOKEN=ollama
+export ANTHROPIC_API_KEY=""
+```
 ---
 
 ### (6) Initialize a project
 
 ```bash
 cd ${path_to_project_dir}
-claude /mcp
+claude /mcp # add --model gemma4:31b if use local gemma4 model 
 ```
 
 Wait until initialization completes, then exit.
@@ -167,11 +169,11 @@ wget https://zenodo.org/record/1324070/files/wt_input_rep2.bam
 
 ### (2) Prompt
 ```
-Identify H3K4me3 and H3K27me3 peaks, annotate their genomic features, evaluate the data quality, and generate genome-wide signal tracks for visualization in IGV with available skills.
+Identify H3K4me3 and H3K27me3 peaks and generate genome-wide signal tracks for visualization in IGV with available skills.
 ```
 ### (3) Output
 
-[example output reports from ChromSkills](example/reports/Task1.md)
+[example output reports from ChromSkills](example/reports/ChIPseq_analysis_report..md)
 ---
 
 ## 4. Advanced Usage
@@ -193,7 +195,7 @@ Directory structure:
 
 Execution flow:
 
-1.Claude reads Skill metadata<br>
+1.Coding agents reads Skill metadata<br>
 2.Matches Skills to user intent<br>
 3.Loads full Skill logic on demand<br>
 4.Executes tools with context-aware parameters<br>

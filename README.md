@@ -7,7 +7,7 @@ ChromSkills translates **natural-language analysis intents** into structured, to
 ---
 ![image](https://github.com/BIsnake2001/ChromSkills/blob/master/img/ChromSkills_framework.png)
 
-## Overview
+## Example usage of ChromSkills
 [![ChromSkills](https://img.youtube.com/vi/sgEKayNTHfM/0.jpg)](https://www.youtube.com/watch?v=sgEKayNTHfM)
 
 ## 1. Scope

@@ -42,7 +42,7 @@ Use the table below to quickly determine whether your data can be analyzed **dir
 ### (1) Pull Docker image
 
 ```bash
-docker pull yuxuan2001/chromskills
+docker pull yuxuan2001/chromskills:0429
 ```
 
 ---

@@ -144,12 +144,12 @@ cd ${path_to_project_dir}
 claude /mcp # add --model gemma4:31b if use local gemma4 model 
 ```
 
-Wait until initialization completes, then exit.
+Wait until initialization completes, then exit or just start a conversation here.
 
 ---
 
-### (7) Start a chat session
-
+### (7) (Optionnal) Start a chat session
+The chat session is only compatible with Claude Code
 ```bash
 chat
 ```
@@ -176,7 +176,7 @@ Identify H3K4me3 and H3K27me3 peaks and generate genome-wide signal tracks for v
 ```
 ### (3) Output
 
-[example output reports from ChromSkills](example/reports/ChIPseq_analysis_report..md)
+[example output reports from ChromSkills](example/reports/ChIPseq_analysis_report.md)
 ---
 
 ## 4. Advanced Usage

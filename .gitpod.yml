@@ -1,0 +1,24 @@
+image: gitpod/workspace-full:latest
+
+tasks:
+  - name: Start ChromSkills
+    init: |
+      docker pull yuxuan2001/chromskills:0429
+    command: |
+      mkdir -p /workspace/chromskills-work
+
+      echo "Starting ChromSkills Docker container..."
+      docker rm -f chromskills 2>/dev/null || true
+
+      docker run --rm -it \
+        -p 8080:8080 \
+        -v /workspace/ChromSkills:/repo \
+        -v /workspace/chromskills-work:/work \
+        --name chromskills \
+        yuxuan2001/chromskills:0429 \
+        /bin/bash /repo/.reviewer/start_chromskills.sh
+
+ports:
+  - port: 8080
+    onOpen: ignore
+    visibility: private

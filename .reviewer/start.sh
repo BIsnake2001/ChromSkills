@@ -25,46 +25,34 @@ echo ""
 # ------------------------------------------------------------
 # DeepSeek Anthropic-compatible configuration
 # ------------------------------------------------------------
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-export ANTHROPIC_MODEL="deepseek-v4-pro[1m]"
-export ANTHROPIC_SMALL_FAST_MODEL="deepseek-v4-flash"
+# Add DeepSeek Anthropic-compatible configuration to ~/.bashrc if not already present
+CONFIG_LINE1='export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"'
+CONFIG_LINE2='export ANTHROPIC_MODEL="deepseek-v4-pro[1m]"'
+CONFIG_LINE3='export ANTHROPIC_SMALL_FAST_MODEL="deepseek-v4-flash"'
 
-# Optional but useful for Claude Code model routing
-export ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-v4-pro[1m]"
-export ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-v4-pro[1m]"
-export ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-v4-flash"
-export CLAUDE_CODE_SUBAGENT_MODEL="deepseek-v4-flash"
+if ! grep -Fxq "$CONFIG_LINE1" ~/.bashrc; then
+  echo "$CONFIG_LINE1" >> ~/.bashrc
+fi
+if ! grep -Fxq "$CONFIG_LINE2" ~/.bashrc; then
+  echo "$CONFIG_LINE2" >> ~/.bashrc
+fi
+if ! grep -Fxq "$CONFIG_LINE3" ~/.bashrc; then
+  echo "$CONFIG_LINE3" >> ~/.bashrc
+fi
+
+# Reload ~/.bashrc for current shell session if running interactively
+DATA_DIR="$HOME/ChromOmics/ChIPseq"
+mkdir -p "$DATA_DIR"
+
 
 echo "DeepSeek environment variables configured."
 echo ""
 
-# ------------------------------------------------------------
-# Ask reviewer for API key
-# ------------------------------------------------------------
-if [ -z "${ANTHROPIC_AUTH_TOKEN:-}" ]; then
-  echo "Please paste your DeepSeek API key."
-  echo "Input will be hidden."
-  echo ""
-
-  read -r -s -p "DEEPSEEK_API_KEY: " REVIEWER_DEEPSEEK_API_KEY
-  echo ""
-
-  if [ -z "${REVIEWER_DEEPSEEK_API_KEY:-}" ]; then
-    echo "ERROR: No API key was provided."
-    exit 1
-  fi
-
-  export ANTHROPIC_AUTH_TOKEN="${REVIEWER_DEEPSEEK_API_KEY}"
-fi
-
-echo "API key configured for this session."
-echo ""
 
 # ------------------------------------------------------------
 # Download review data
 # ------------------------------------------------------------
-DATA_DIR="${CHROMSKILLS_DATA_DIR:-$PWD/data/zenodo_1324070}"
-mkdir -p "$DATA_DIR"
+
 
 echo "============================================================"
 echo " Downloading review data"
@@ -97,12 +85,12 @@ download_file() {
   fi
 }
 
-download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep1.bam"
-download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep2.bam"
-download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep1.bam"
-download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep2.bam"
-download_file "https://zenodo.org/record/1324070/files/wt_input_rep1.bam"
-download_file "https://zenodo.org/record/1324070/files/wt_input_rep2.bam"
+# download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep1.bam"
+# download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep2.bam"
+# download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep1.bam"
+# download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep2.bam"
+# download_file "https://zenodo.org/record/1324070/files/wt_input_rep1.bam"
+# download_file "https://zenodo.org/record/1324070/files/wt_input_rep2.bam"
 
 export CHROMSKILLS_DATA_DIR="$DATA_DIR"
 export DATA_DIR="$DATA_DIR"
@@ -158,21 +146,19 @@ echo "============================================================"
 echo " Starting Claude"
 echo "============================================================"
 echo ""
+cd "$DATA_DIR"
 
 if ! command -v claude >/dev/null 2>&1; then
   echo "ERROR: claude command was not found."
   exit 1
 fi
 
-echo "Initializing MCP..."
-claude /mcp || true
-
 echo ""
-echo "Opening ChromSkills chat..."
+echo "then run the following steps in a new terminal window ..."
 echo ""
+echo "cd ~/ChromOmics/ChIPseq"
+echo "source ~/.bashrc"
+echo "export ANTHROPIC_API_KEY=\"your_api_key\""
+echo "claude /mcp"
 
-if command -v chat >/dev/null 2>&1; then
-  exec chat
-else
-  exec claude
-fi
+

@@ -85,12 +85,12 @@ download_file() {
   fi
 }
 
-# download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep1.bam"
-# download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep2.bam"
-# download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep1.bam"
-# download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep2.bam"
-# download_file "https://zenodo.org/record/1324070/files/wt_input_rep1.bam"
-# download_file "https://zenodo.org/record/1324070/files/wt_input_rep2.bam"
+download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep1.bam"
+download_file "https://zenodo.org/record/1324070/files/wt_H3K4me3_rep2.bam"
+download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep1.bam"
+download_file "https://zenodo.org/record/1324070/files/wt_H3K27me3_rep2.bam"
+download_file "https://zenodo.org/record/1324070/files/wt_input_rep1.bam"
+download_file "https://zenodo.org/record/1324070/files/wt_input_rep2.bam"
 
 export CHROMSKILLS_DATA_DIR="$DATA_DIR"
 export DATA_DIR="$DATA_DIR"

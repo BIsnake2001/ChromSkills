@@ -1,0 +1,5 @@
+# copy and paste the following commands in a new terminal
+cd ~/ChromOmics/ChIPseq
+source ~/.bashrc
+export ANTHROPIC_API_KEY="repalce_your_api_key_here"
+claude /mcp

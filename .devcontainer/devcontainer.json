@@ -1,0 +1,16 @@
+{
+    "name": "ChromSkills Reviewer Environment",
+    "image": "yuxuan2001/chromskills:0429",
+    "workspaceFolder": "/workspaces/ChromSkills",
+    "forwardPorts": [8080],
+    "postCreateCommand": "chmod +x .reviewer/start.sh || true",
+    "postStartCommand": "bash .reviewer/start.sh || true",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-python.python",
+          "ms-toolsai.jupyter"
+        ]
+      }
+    }
+  }
